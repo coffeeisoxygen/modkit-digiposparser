@@ -5,22 +5,25 @@ Thumbs.db
 # Python-generated files
 __pycache__/
 *.py[oc]
-*.egg-info
 
-# Virtual environments
-.venv
+# Version file
+app/_version.py
 
 # Build, distribution, and packaging
 build/
 dist/
 wheels/
+*.egg-info/
+*.whl
+*.tar.gz
+*.zip
+
+# Virtual environments
+.venv
 
 # Test and cache files
 .pytest_cache/
 .ruff_cache/
-
-# Version file
-src/_version.py
 
 # IDE/editor/project files
 .vscode/
@@ -36,7 +39,6 @@ src/_version.py
 # Reports and test folders
 .reports/
 .reports/allure/
-.reports/
 
 # Logs, data, and backup
 *.log
@@ -60,3 +62,9 @@ user_info.json
 *.instructions.md
 *.prompt.md
 *.chatmode.md
+*.egg-info/
+dist/
+build/
+*.whl
+*.tar.gz
+*.zip
