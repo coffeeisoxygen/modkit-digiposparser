@@ -9,7 +9,7 @@ SAMPLEDATA = (
     Path(__file__).resolve().parent.parent.parent.parent / "example_response.json"
 )
 
-EXCLUDE_PRODUCTNAME = ["GIGAMAX"]
+EXCLUDE_PRODUCTNAME = ["GIGAMAX", "NONTON"]
 REMOVE_QUOTAWORDS = []
 
 
@@ -417,11 +417,12 @@ def main():
     # Analisis efek optimisasi quota pada total response
     print(f"\n--- Character Count Analysis ---")
     data_original = json.loads(example_response)
+    data_filtered = json.loads(filtered_response)  # Data setelah filtering
     data_optimized = json.loads(optimized_response)
 
-    # Hitung total karakter quota sebelum optimisasi
+    # Hitung total karakter quota sebelum optimisasi (dari data yang sudah difilter)
     quota_chars_before = sum(
-        len(str(p.get("quota", ""))) for p in data_original.get("paket", [])
+        len(str(p.get("quota", ""))) for p in data_filtered.get("paket", [])
     )
 
     # Hitung total karakter quota setelah optimisasi (dari data yang sudah dioptimasi)
@@ -434,13 +435,15 @@ def main():
     print(f"Quota optimization savings: {quota_chars_before - quota_chars_after} chars")
 
     # Step 4: konsistensi pengukuran - gunakan json.dumps untuk keduanya
-    original_normalized = json.dumps(data_original, separators=(",", ":"))
+    original_normalized = json.dumps(
+        data_filtered, separators=(",", ":")
+    )  # Gunakan data filtered
     optimized_normalized = json.dumps(data_optimized, separators=(",", ":"))
 
     char_before_normalized = len(original_normalized)
     char_after_normalized = len(optimized_normalized)
 
-    count_before = len(data_original.get("paket", []))
+    count_before = len(data_filtered.get("paket", []))  # Count dari data filtered
     count_after = len(data_optimized.get("paket", []))
 
     print(
@@ -470,7 +473,7 @@ def main():
     }
 
     tracker.save_analysis_output(
-        original_data=data_original,
+        original_data=data_filtered,  # Gunakan data yang sudah difilter
         optimized_data=data_optimized,
         analysis_stats=analysis_stats,
     )
