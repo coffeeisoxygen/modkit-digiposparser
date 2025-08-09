@@ -18,7 +18,7 @@ from app.mlogg.log_utils import logger, timeit
 # Sample data path
 SAMPLEDATA = (
     Path(__file__).resolve().parent.parent.parent.parent
-    / "example_final_VOICE_SMS.json"
+    / "example_final_BYU.json"
 )
 
 # Character limit constant
