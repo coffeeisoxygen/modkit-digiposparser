@@ -24,16 +24,3 @@ class Settings(BaseSettings):
     app: AppConfig
     digipos: DigiposCoreConfig
     digipos_response: DigiposRespConfig
-
-
-def main():
-    from app.config.dep_settings import get_settings
-
-    settings = get_settings()
-    print(settings.app)
-    # Dump all settings as dict
-    print(settings.model_dump())
-
-
-if __name__ == "__main__":
-    main()
