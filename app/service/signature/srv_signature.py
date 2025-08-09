@@ -2,9 +2,6 @@
 
 import base64
 import hashlib
-from typing import Annotated
-
-from fastapi import Depends
 
 
 class OtomaxSignatureService:
