@@ -72,3 +72,4 @@ build/
 gemini.md
 # any data beginig with sample must ignore
 example_*
+output/
