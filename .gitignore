@@ -70,3 +70,5 @@ build/
 *.zip
 
 gemini.md
+# any data beginig with sample must ignore
+example_*
