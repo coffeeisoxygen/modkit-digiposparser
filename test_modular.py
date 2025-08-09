@@ -13,9 +13,10 @@ from app.service.response import (
 )
 
 # Test data paths
-BASE_PATH = Path(__file__).resolve().parent.parent.parent.parent
+BASE_PATH = Path(__file__).resolve().parent
 DATA_SAMPLE = BASE_PATH / "example_final_DATA.json"
 DIGITAL_SAMPLE = BASE_PATH / "example_final_digital_other.json"
+VF_SAMPLE = BASE_PATH / "example_final_VF.json"
 
 
 def test_supported_categories():
@@ -89,17 +90,24 @@ def test_small_response():
 
 
 def test_activation_processing():
-    """Test activation processing (VF) - placeholder for now."""
-    print("=== ACTIVATION PROCESSING TEST ===")
+    """Test activation processing (VF) with real VF data."""
+    print("=== ACTIVATION PROCESSING TEST (REAL VF DATA) ===")
 
-    # Minimal test JSON for VF
-    vf_sample = '{"to":"123456","paket":[{"productId":"VF001","productName":"Test VF Product","quota":"Test quota","total_":1000}]}'
+    if not VF_SAMPLE.exists():
+        print(f"❌ VF sample file not found: {VF_SAMPLE}")
+        return
+
+    with open(VF_SAMPLE, encoding="utf-8") as f:
+        response_data = f.read()
+
+    print(f"VF original size: {len(response_data)} chars")
 
     try:
-        result = process_category_response("VF", vf_sample)
+        result = process_category_response("VF", response_data)
         print(f"VF processed size: {len(result)} chars")
-        print(f"VF sample output: {result}")
-        print("✅ Activation processing SUCCESS (placeholder)")
+        print(f"VF within limit: {len(result) <= 7000}")
+        print(f"VF sample output: {result[:200]}...")
+        print("✅ Activation processing SUCCESS (real VF data)")
     except Exception as e:
         print(f"❌ Activation processing FAILED: {e}")
     print()
