@@ -2,8 +2,10 @@
 
 Core principles:
 1. Always check character limit <= 7000
-2. Only apply filtering if exceeds limit
-3. Category-specific processors via factory pattern
+2. Apply filtering based on processor type (RECHARGE vs ACTIVATION)
+3. Two main processor types:
+   - RECHARGE: For mobile numbers (DATA/VOICE_SMS/DIGITAL_*/ROAMING/BYU/HVC_*)
+   - ACTIVATION: For VCR/VF (VF category)
 4. Standardized output format: #id|name(quota)|total#
 """
 
@@ -17,7 +19,7 @@ from app.mlogg.log_utils import logger, timeit
 
 # Sample data path
 SAMPLEDATA = (
-    Path(__file__).resolve().parent.parent.parent.parent / "example_final_DATA.json"
+    Path(__file__).resolve().parent.parent.parent.parent / "example_final_VF.json"
 )
 
 # Character limit constant
