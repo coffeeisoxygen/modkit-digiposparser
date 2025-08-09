@@ -6,10 +6,10 @@ from app.mlogg.log_utils import timeit, logger
 
 
 SAMPLEDATA = (
-    Path(__file__).resolve().parent.parent.parent.parent / "example_response_small.json"
+    Path(__file__).resolve().parent.parent.parent.parent / "example_response.json"
 )
 
-EXCLUDE_PRODUCTNAME = ["Nonton", "productB"]
+EXCLUDE_PRODUCTNAME = []
 
 
 class ResponseTracker:
@@ -43,6 +43,35 @@ class ResponseTracker:
         return self.total_char, need_toparse
 
     @timeit
+    def clean_quota_metadata(self, quota: str) -> str:
+        """
+        Membersihkan metadata dari field quota.
+        Mengambil hanya deskripsi setelah '/' dari setiap item quota.
+
+        Input: "DATA National/Internet 30 Days 12 GB Nasional, Local Data/Kuota Lokal Internet 30 Days 43 GB"
+        Output: "Internet 30 Days 12 GB Nasional,Kuota Lokal Internet 30 Days 43 GB"
+        """
+        import re
+
+        # Split by comma untuk mendapatkan setiap item quota
+        items = quota.split(",")
+        cleaned_items = []
+
+        for item in items:
+            item = item.strip()
+            if "/" in item:
+                # Ambil bagian setelah '/' sebagai deskripsi
+                description = item.split("/", 1)[1].strip()
+                cleaned_items.append(description)
+            elif item:  # Jika tidak ada '/', tetap ambil item asli (jika tidak kosong)
+                cleaned_items.append(item)
+
+        self.logger.bind(func="clean_quota_metadata").info(
+            f"Cleaned quota items: {len(cleaned_items)}"
+        )
+        return ",".join(cleaned_items)
+
+    @timeit
     def filter_productbyname_if_beginig_with(self, response: Any) -> Any:
         """
         Buang produk yang ProductName diawali salah satu prefix di EXCLUDE_PRODUCTNAME (case-insensitive, regex).
@@ -57,9 +86,11 @@ class ResponseTracker:
         for p in paket:
             pname = str(p.get("productName", ""))
             # Jika diawali salah satu prefix, produk DIBUANG
+            # Skip jika prefix kosong untuk menghindari match semua string
             if any(
                 re.match(rf"^{re.escape(f)}", pname, re.IGNORECASE)
                 for f in EXCLUDE_PRODUCTNAME
+                if f.strip()  # Hanya gunakan prefix yang tidak kosong
             ):
                 continue
             filtered_paket.append(p)
@@ -96,11 +127,11 @@ class ResponseTracker:
         )
         # Format message: #productid|productname(quota)|total#...
         message = "#" + "#".join(
-            f"{p.get('productId', '')}|{str(p.get('productName', ''))}({str(p.get('quota', ''))})|{p.get('total_', '')}"
+            f"{p.get('productId', '')}|{str(p.get('productName', ''))}({self.clean_quota_metadata(str(p.get('quota', '')))})|{p.get('total_', '')}"
             for p in paket
         )
         metadata = f"metadata=section char before {{{char_before}}} - after is {{{char_after}}} and count before {{{count_before}}} - after {{{count_after}}}"
-        return f"{metadata}&to=[{to}]&message={message}"
+        return f"{metadata}&to={to}&message={message}"
 
 
 def main():
