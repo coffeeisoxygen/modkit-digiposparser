@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from app.service.hasher.srv_hasher import HasherService
+from fastapi import Depends
 
 
 def get_hasher_service() -> HasherService:
@@ -8,4 +9,4 @@ def get_hasher_service() -> HasherService:
     return HasherService()
 
 
-HasherDep = Annotated[HasherService, get_hasher_service]
+HasherDep = Annotated[HasherService, Depends(get_hasher_service)]

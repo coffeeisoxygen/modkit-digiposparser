@@ -20,4 +20,3 @@ class HasherService:
             return False
         except Exception:
             return False
-            return False

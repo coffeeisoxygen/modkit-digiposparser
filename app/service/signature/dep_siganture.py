@@ -4,6 +4,11 @@ from app.service.signature.srv_signature import OtomaxSignatureService
 from fastapi import Depends
 
 
+def get_signature_service() -> OtomaxSignatureService:
+    """FastAPI dependency-injectable function for getting OtomaxSignatureService instance."""
+    return OtomaxSignatureService()
+
+
 def get_transaction_signature(
     memberid: str,
     product: str,
@@ -11,7 +16,7 @@ def get_transaction_signature(
     refid: str,
     pin: str,
     password: str,
-    service: OtomaxSignatureService = Depends(OtomaxSignatureService),
+    service: OtomaxSignatureService = Depends(get_signature_service),
 ) -> str:
     """FastAPI dependency-injectable function for generating OtomaX transaction signature.
 
@@ -32,4 +37,5 @@ def get_transaction_signature(
     )
 
 
-TrxSignDep = Annotated[str, Depends(OtomaxSignatureService)]
+# Service injection dependency (flexible)
+OtomaxSignServiceDep = Annotated[OtomaxSignatureService, Depends(get_signature_service)]
