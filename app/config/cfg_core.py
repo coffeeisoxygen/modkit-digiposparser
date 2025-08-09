@@ -1,5 +1,5 @@
 from app.config.cfg_app import AppConfig
-from app.config.cfg_digipos import DigiposCoreConfig, DigiposRespConfig
+from app.config.cfg_digipos_credential import DigiposCoreConfig, DigiposRespConfig
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
