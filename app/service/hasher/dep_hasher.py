@@ -9,4 +9,4 @@ def get_hasher_service() -> HasherService:
     return HasherService()
 
 
-HasherDep = Annotated[HasherService, Depends(get_hasher_service)]
+HasherServiceDep = Annotated[HasherService, Depends(get_hasher_service)]
