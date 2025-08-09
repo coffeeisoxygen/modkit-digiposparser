@@ -1,0 +1,4 @@
+
+Todo:
+  ☐ make endpoint like this : /digipos/list?min=int&max=int&to=[tujuan]&so on
+    ☐ maka yg akan di panggil adalah tipe response yg bisa query between days

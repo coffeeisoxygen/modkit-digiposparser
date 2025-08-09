@@ -1,3 +1,10 @@
+# NOTE:
+# Always import `logger` from this module (app.mlogg.log_utils) to ensure colorized output.
+# Do NOT import `logger` directly from loguru elsewhere, or before this module's configuration runs.
+# Example:
+#   from app.mlogg.log_utils import logger
+# This guarantees colorized logs everywhere.
+
 import functools
 import sys
 import time
@@ -17,10 +24,10 @@ class Formatter:
         return self.fmt
 
 
-formatter = Formatter()
-
-logger.remove()  # Remove default logger
-logger.add(sys.stdout, colorize=True, level="DEBUG", format=formatter.format)
+def setup_logcustom():
+    formatter = Formatter()
+    logger.remove()  # Remove default logger
+    logger.add(sys.stdout, colorize=True, level="DEBUG", format=formatter.format)
 
 
 def timeit(func):

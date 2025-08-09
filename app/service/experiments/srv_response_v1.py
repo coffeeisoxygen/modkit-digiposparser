@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Any
 
-from app.mlogg.log_utils import timeit, logger
+from app.mlogg.log_utils import logger, setup_logcustom, timeit
 
 
 SAMPLEDATA = (
@@ -374,6 +374,7 @@ class ResponseTracker:
 
 
 def main():
+    setup_logcustom()
     import json
 
     # Example usage, replace with actual loading if needed
