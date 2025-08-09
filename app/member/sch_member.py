@@ -52,8 +52,8 @@ class MemberInDB(BaseModel):
         """Validasi password."""
         # Accept int or str, convert to str for validation
         value_str = str(value)
-        if len(value_str) != 8:
-            raise ValueError("Password must be exactly 8 characters long")
+        if len(value_str) < 6:
+            raise ValueError("Password must be at least 6 characters long")
         return value_str
 
     @field_validator("memberid", mode="before")
