@@ -17,8 +17,7 @@ from app.mlogg.log_utils import logger, timeit
 
 # Sample data path
 SAMPLEDATA = (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "example_final_BYU.json"
+    Path(__file__).resolve().parent.parent.parent.parent / "example_final_DATA.json"
 )
 
 # Character limit constant
@@ -59,13 +58,10 @@ class CategoryProcessor(ABC):
         char_count = len(response_data)
         self.logger.info(f"Response character count: {char_count}")
 
-        if char_count <= MAX_CHAR_LIMIT:
-            self.logger.info("Response within limit, no filtering needed")
-            return self._format_output(json.loads(response_data))
-
-        # 2. Apply filtering and optimization
-        self.logger.info("Response exceeds limit, applying filters")
         data = json.loads(response_data)
+
+        # 2. Always apply filtering (to clean irrelevant data)
+        self.logger.info("Applying filters to clean data...")
 
         # Filter by subcategory
         filtered_data = self._filter_by_subcategory(data)
@@ -76,11 +72,16 @@ class CategoryProcessor(ABC):
         # Filter by quota metadata patterns
         filtered_data = self._filter_by_quota_metadata(filtered_data)
 
-        # Optimize quota strings
-        optimized_data = self._optimize_quotas(filtered_data)
+        # 3. Apply text optimization only if needed
+        if char_count <= MAX_CHAR_LIMIT:
+            self.logger.info("Response within limit, skipping text optimization")
+            final_data = filtered_data
+        else:
+            self.logger.info("Response exceeds limit, applying text optimization")
+            final_data = self._optimize_quotas(filtered_data)
 
         # Final character check
-        final_output = self._format_output(optimized_data)
+        final_output = self._format_output(final_data)
         final_char_count = len(final_output)
         self.logger.info(f"Final output character count: {final_char_count}")
 
