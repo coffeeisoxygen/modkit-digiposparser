@@ -18,12 +18,10 @@ class RechargeProcessor(BaseProcessor):
 
     def get_exclude_subcategories(self) -> list[str]:
         """Subcategories to exclude for recharge categories."""
-        # Можно добавить category-specific exclusions если нужно
         return [""]  # No exclusions by default
 
     def get_exclude_productnames(self) -> list[str]:
         """Product name patterns to exclude for recharge categories."""
-        # Можно добавить category-specific exclusions если нужно
         return [""]  # No exclusions by default
 
     def get_exclude_quota_metadata(self) -> list[str]:
