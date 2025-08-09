@@ -68,3 +68,5 @@ build/
 *.whl
 *.tar.gz
 *.zip
+
+gemini.md
