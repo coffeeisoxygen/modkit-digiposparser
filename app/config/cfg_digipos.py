@@ -13,3 +13,6 @@ class DigiposConfig(BaseModel):
     API_PASSWORD: str
     API_PIN: str
     API_NAME: str
+    RESPONSE_EXCLUDE_SUBCATEGORY: list[str]
+    RESPONSE_EXCLUDE_PRODUCTNAME: list[str]
+    RESPONSE_EXCLUDE_QUOTA_METADATA: list[str]
