@@ -11,8 +11,3 @@ class AppConfig(BaseModel):
     loglevel: str = Field(validation_alias="LOGLEVEL")
     version: str = Field(validation_alias="VERSION")
     blockrequest: bool = Field(validation_alias="BLOCKREQUEST")
-
-    model_config = {
-        "populate_by_name": True,
-        "extra": "ignore",
-    }

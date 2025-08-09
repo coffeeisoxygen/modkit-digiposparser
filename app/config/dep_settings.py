@@ -3,7 +3,12 @@
 from functools import lru_cache
 from typing import Annotated
 
-from app.config.cfg_core import AppConfig, DigiposConfig, Settings
+from app.config.cfg_core import (
+    AppConfig,
+    DigiposCoreConfig,
+    DigiposRespConfig,
+    Settings,
+)
 
 
 @lru_cache
@@ -12,7 +17,7 @@ def get_settings() -> Settings:
     return Settings()  # type: ignore
 
 
-def get_digipos_config() -> DigiposConfig:
+def get_digipos_config() -> DigiposCoreConfig:
     """Get the Digipos configuration."""
     return get_settings().digipos
 
@@ -22,6 +27,12 @@ def get_app_config() -> AppConfig:
     return get_settings().app
 
 
+def get_digipos_response() -> DigiposRespConfig:
+    """Get the Digipos response configuration."""
+    return get_settings().digipos_response
+
+
 # Annotated Style For Cleaner Import
-DigiposConfigDep = Annotated[DigiposConfig, get_digipos_config]
+DigiposConfigDep = Annotated[DigiposCoreConfig, get_digipos_config]
 AppConfigDep = Annotated[AppConfig, get_app_config]
+DigiposResponseDep = Annotated[DigiposRespConfig, get_digipos_response]

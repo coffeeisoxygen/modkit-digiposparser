@@ -1,5 +1,5 @@
 from app.config.cfg_app import AppConfig
-from app.config.cfg_digipos import DigiposConfig
+from app.config.cfg_digipos import DigiposCoreConfig, DigiposRespConfig
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,4 +22,18 @@ class Settings(BaseSettings):
     )
 
     app: AppConfig
-    digipos: DigiposConfig
+    digipos: DigiposCoreConfig
+    digipos_response: DigiposRespConfig
+
+
+def main():
+    from app.config.dep_settings import get_settings
+
+    settings = get_settings()
+    print(settings.app)
+    # Dump all settings as dict
+    print(settings.model_dump())
+
+
+if __name__ == "__main__":
+    main()
