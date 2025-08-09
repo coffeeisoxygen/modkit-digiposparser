@@ -1,3 +1,5 @@
+import ipaddress
+
 from pydantic import AnyHttpUrl, BaseModel, Field, SecretStr, field_validator
 
 
@@ -29,12 +31,6 @@ class MemberInDB(BaseModel):
         default=False,
         description="Apakah member diizinkan untuk hit tanpa Signature(ini Biasanya Otomax Signature)",
     )
-
-    # Pydantic V2 config
-    model_config = {
-        "populate_by_name": True,
-        "extra": "forbid",
-    }
 
     @field_validator("pin", mode="before")
     @classmethod
@@ -69,16 +65,11 @@ class MemberInDB(BaseModel):
     @classmethod
     def validate_ip_address(cls, value: str) -> str:
         """Validasi alamat IP."""
-        value_str = str(value)
-        parts = value_str.split(".")
-        if len(parts) != 4:
-            raise ValueError("IP address must be in the format 'X.X.X.X'")
-        for part in parts:
-            if not part.isdigit() or not (0 <= int(part) <= 255):
-                raise ValueError(
-                    "Each part of the IP address must be a number between 0 and 255"
-                )
-        return value_str
+        try:
+            ipaddress.IPv4Address(value)  # Built-in validation
+            return str(value)
+        except ValueError:
+            raise ValueError("Invalid IPv4 address format")
 
     @field_validator("report_url", mode="before")
     @classmethod
