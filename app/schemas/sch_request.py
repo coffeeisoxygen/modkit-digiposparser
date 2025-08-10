@@ -1,6 +1,6 @@
 """common standardized and work for future development."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ReqClientConfig(BaseModel):
@@ -20,10 +20,13 @@ class ReqClientBase(ReqClientConfig):
 
     memberid: str  # this is must present klo ini ngga ada ngga valid
     product: str  # overide nanti per domain sesuai validasi masing masing
-    sign: str | None
-    dest: str | None
-    pin: str | None
-    password: str | None
+    action: str  # Overide Nanti Per Domain
+    dest: str
+    sign: str | None = None
+    pin: str | None = None
+    password: str | None = None
+
+    model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True)
 
 
 # SABAR Lakukan Satu Per Satu , Make Sure Dulu Semua Udah Clean, baru Jalan Lagi.

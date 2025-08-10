@@ -6,6 +6,14 @@ from app.schemas.sch_request import ReqClientBase
 from pydantic import field_validator
 
 
+class DigposActionEnum(StrEnum):
+    """Enum untuk action yang valid pada endpoint Digipos."""
+
+    LIST = "list"
+    CHECK = "check"
+    BUY = "buy"
+
+
 class DigiposCatAsProdEnum(StrEnum):
     """Kategori yang valid untuk endpoint list paket Digipos."""
 
@@ -25,6 +33,7 @@ class DigiposListRequest(ReqClientBase):
     """Request model untuk endpoint list paket Digipos."""
 
     product: str
+    action: str
 
     # future field and feature
     up_harga: float | None = None
@@ -35,9 +44,19 @@ class DigiposListRequest(ReqClientBase):
     @classmethod
     def validate_product_enum(cls, v: str) -> str:
         """Validate product field against DigiposCatAsProdEnum."""
-        if v not in DigiposCatAsProdEnum.__members__.values():
+        if v not in [e.value for e in DigiposCatAsProdEnum]:
             raise ValueError(
                 f"product must be one of: {[e.value for e in DigiposCatAsProdEnum]}"
+            )
+        return v
+
+    @field_validator("action")
+    @classmethod
+    def validate_action_enum(cls, v: str) -> str:
+        """Validate action field against DigposActionEnum."""
+        if v not in [e.value for e in DigposActionEnum]:
+            raise ValueError(
+                f"action must be one of: {[e.value for e in DigposActionEnum]}"
             )
         return v
 
