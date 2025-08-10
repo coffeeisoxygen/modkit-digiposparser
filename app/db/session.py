@@ -8,6 +8,7 @@ jadi stick dulu dengan sqlalchemy.
 import contextlib
 from collections.abc import AsyncIterator
 
+from app.db.base import Base
 from app.dependencies.dep_settings import get_settings
 from app.exceptions.exc_service import InternalServiceError
 from loguru import logger
@@ -83,3 +84,16 @@ async def get_db_session():
     """
     async with sessionmanager.session() as session:
         yield session
+
+
+# call this with alembic, we use alembic for database migration.
+async def create_tables():
+    """Create all tables in the database using SQLAlchemy Base metadata.
+
+    This function initializes the database schema by creating tables
+    defined in the SQLAlchemy models.
+    """
+    if sessionmanager.engine is None:
+        raise InternalServiceError("Database engine is not initialized")
+    async with sessionmanager.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
