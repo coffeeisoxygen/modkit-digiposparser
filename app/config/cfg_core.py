@@ -25,3 +25,5 @@ class Settings(BaseSettings):
     app: AppConfig
     digipos: DigiposCoreConfig
     digipos_response: DigiposRespConfig
+    database_url: str = "sqlite+aiosqlite:///./app.db"
+    echo: bool = False

@@ -32,7 +32,14 @@ def get_digipos_response() -> DigiposRespConfig:
     return get_settings().digipos_response
 
 
+def get_database_config() -> tuple[str, bool]:
+    """Get the database configuration (url, echo)."""
+    settings = get_settings()
+    return settings.database_url, settings.echo
+
+
 # Annotated Style For Cleaner Import
 DigiposConfigDep = Annotated[DigiposCoreConfig, get_digipos_config]
 AppConfigDep = Annotated[AppConfig, get_app_config]
 DigiposResponseDep = Annotated[DigiposRespConfig, get_digipos_response]
+DatabaseConfigDep = Annotated[tuple[str, bool], get_database_config]
