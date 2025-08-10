@@ -56,7 +56,7 @@ class JsonResponseAdapter(ResponseAdapter):
         """Format error as JSON response."""
         # Check if it's our custom exception with JSON support
         if hasattr(error, "to_response"):
-            return error.to_response()
+            return error.to_response()  # type: ignore
 
         # Handle status code
         status_code = getattr(error, "status_code", 500)
@@ -91,7 +91,7 @@ class PlaintextResponseAdapter(ResponseAdapter):
         """Format error as plaintext response."""
         # Check if it's our custom exception with plaintext support
         if hasattr(error, "to_plaintext"):
-            content = error.to_plaintext()
+            content = error.to_plaintext()  # type: ignore
         else:
             content = f"Error: {error!s}"
 

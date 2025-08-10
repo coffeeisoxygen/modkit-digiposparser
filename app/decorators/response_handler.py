@@ -59,7 +59,7 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
                 # Create a mock exception with required methods
                 validation_error = type(
                     "ValidationError",
-                    (),
+                    (Exception,),  # <-- inherit from Exception
                     {
                         "to_plaintext": lambda: f"Validation Error: {error_msg}",
                         "to_response": lambda: adapter.format_error(e),
@@ -68,7 +68,7 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
                     },
                 )()
 
-                return adapter.format_error(validation_error)
+                return adapter.format_error(validation_error)  # type: ignore
 
             except ValidationError as e:
                 # Handle direct Pydantic validation errors
@@ -78,7 +78,7 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
 
                 validation_error = type(
                     "ValidationError",
-                    (),
+                    (Exception,),  # <-- inherit from Exception
                     {
                         "to_plaintext": lambda: f"Validation Error: {error_msg}",
                         "status_code": 422,
