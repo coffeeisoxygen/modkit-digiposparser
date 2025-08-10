@@ -9,33 +9,5 @@ def get_signature_service() -> OtomaxSignatureService:
     return OtomaxSignatureService()
 
 
-def get_transaction_signature(
-    memberid: str,
-    product: str,
-    dest: str,
-    refid: str,
-    pin: str,
-    password: str,
-    service: OtomaxSignatureService = Depends(get_signature_service),
-) -> str:
-    """FastAPI dependency-injectable function for generating OtomaX transaction signature.
-
-    Args:
-        memberid: Member ID (will be converted to UPPERCASE)
-        product: Product code (will be converted to UPPERCASE)
-        dest: Destination phone number (original case)
-        refid: Reference/Transaction ID (original case)
-        pin: Member PIN (original case)
-        password: Member password (original case)
-        service: OtomaxSignatureService instance (injected)
-
-    Returns:
-        str: Base64 encoded signature with URL-safe characters
-    """
-    return service.generate_transaction_signature(
-        memberid, product, dest, refid, pin, password
-    )
-
-
-# Service injection dependency (flexible)
+# Service injection dependency (simplified)
 OtomaxSignServiceDep = Annotated[OtomaxSignatureService, Depends(get_signature_service)]
