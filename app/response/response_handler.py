@@ -8,12 +8,12 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
+from app.exceptions.exc_base import BaseExcpError
 from app.response.response_adapter import (
     JsonResponseAdapter,
     PlaintextResponseAdapter,
     ResponseAdapter,
 )
-from app.exceptions.exc_base import BaseExcpError
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 
