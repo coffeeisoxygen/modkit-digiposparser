@@ -79,7 +79,12 @@ class MemberAuthService:
     def _verify_signature(self, request: MemberTrxRequestModel, member_db: MemberInDB):
         """Verifikasi signature yang dikirim client."""
         expected_signature = self.otomax_sign_service.generate_transaction_signature(
-            request, member_db
+            memberid=request.memberid,
+            product=str(request.product or ""),
+            dest=str(request.dest or ""),
+            refid=str(request.refid or ""),
+            pin=member_db.pin.get_secret_value(),
+            password=member_db.password.get_secret_value(),
         )
         if str(request.sign) != str(expected_signature):
             logger.error(
