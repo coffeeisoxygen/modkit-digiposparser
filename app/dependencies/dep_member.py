@@ -1,19 +1,20 @@
-from typing import Annotated
-
-from app.feature.member.rep_member import MemberRepository
+from app.dependencies.dep_siganture import OtomaxSignatureService, get_signature_service
+from app.feature.member import MemberAuthService, MemberManager
 from fastapi import Depends
 
 
-def get_member_repository() -> MemberRepository:
-    """Get the member repository.
-
-    This function provides a singleton instance of the MemberRepository
-    for dependency injection.
-
-    Returns:
-        MemberRepository: The member repository instance.
-    """
-    return MemberRepository("members.yaml")
+def get_member_manager():
+    """Data ada di appstate."""
+    return app.state.member_manager  # type: ignore  # noqa: F821
 
 
-MemberRepoDep = Annotated[MemberRepository, Depends(get_member_repository)]
+def get_auth_service(
+    member_manager: MemberManager = Depends(get_member_manager),
+    signature_service: OtomaxSignatureService = Depends(
+        dependency=get_signature_service
+    ),
+) -> MemberAuthService:
+    """Get the member authentication service."""
+    return MemberAuthService(
+        member_manager=member_manager, otomax_sign_service=signature_service
+    )
