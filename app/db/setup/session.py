@@ -8,7 +8,7 @@ jadi stick dulu dengan sqlalchemy.
 import contextlib
 from collections.abc import AsyncIterator
 
-from app.db.base import Base
+from app.db.setup.base import Base
 from app.dependencies.dep_settings import get_settings
 from app.exceptions.exc_service import InternalServiceError
 from loguru import logger

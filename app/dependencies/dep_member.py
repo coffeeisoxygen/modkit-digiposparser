@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.member.rep_member import MemberRepository
+from app.feature.member.rep_member import MemberRepository
 from fastapi import Depends
 
 

@@ -1,7 +1,7 @@
 """model untuk modul, seperti digipos, isimple sidompul dan lain lain."""
 
 
-from app.db.base import Base
+from app.db.setup.base import Base
 from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column
 

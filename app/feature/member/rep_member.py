@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import yaml
-from app.member.sch_member import MemberInDB
+from app.feature.member.sch_member import MemberInDB
 
 
 class MemberRepository:
