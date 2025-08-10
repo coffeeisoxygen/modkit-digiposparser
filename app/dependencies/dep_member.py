@@ -1,11 +1,11 @@
 from app.dependencies.dep_siganture import OtomaxSignatureService, get_signature_service
 from app.feature.member import MemberAuthService, MemberManager
-from fastapi import Depends
+from fastapi import Depends, Request
 
 
-def get_member_manager():
-    """Data ada di appstate."""
-    return app.state.member_manager  # type: ignore  # noqa: F821
+def get_member_manager(request: Request) -> MemberManager:
+    """Get member manager from app state."""
+    return request.app.state.member_manager
 
 
 def get_auth_service(

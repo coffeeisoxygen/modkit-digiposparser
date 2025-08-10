@@ -2,6 +2,7 @@ import time
 from typing import TYPE_CHECKING
 
 import uvicorn
+from app.custom.app_lifespan import lifespan
 
 # Impor fungsi registrasi router
 from app.router.rtr_register import register_routers
@@ -15,11 +16,11 @@ else:
 version = __version__
 
 
-# Buat instance FastAPI
 app = FastAPI(
     title="Modkit Digipos Parser",
     description="API untuk mem-parsing dan menjadi proxy ke API Digipos.",
     version=version,
+    lifespan=lifespan,
 )
 
 
