@@ -81,11 +81,11 @@ class DigiposTrxRequestBase(ReqClientBase):
 class DigiposRequestList(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.LIST
 
-    # future features
-    minday: NonNegativeInt
-    maxday: NonNegativeInt
-    minprice: NonNegativeInt
-    maxprice: NonNegativeInt
+    # future features - all optional with default None
+    minday: NonNegativeInt = None
+    maxday: NonNegativeInt = None
+    minprice: NonNegativeInt = None
+    maxprice: NonNegativeInt = None
 
     # Validator untuk memvalidasi hubungan antar field
     @model_validator(mode="after")
@@ -108,9 +108,9 @@ class DigiposRequestList(DigiposTrxRequestBase):
 
 class DigiposRequestCheck(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.CHECK
-    productid: str
+    productid: str = Field(description="Product ID to check")
 
 
 class DigiposRequestBuy(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.BUY
-    productid: str
+    productid: str = Field(description="Product ID to buy")
