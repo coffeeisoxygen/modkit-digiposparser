@@ -27,6 +27,9 @@ class ReqClientBase(ReqClientConfig):
         examples=["dest123", "dest456"],
         pattern=r"^\d+$",
     )
+    refid: str = Field(
+        description="Referensi ID untuk transaksi.",
+    )
     sign: str | None = Field(
         default=None,
         description="Signature dari otomax untuk verifikasi request, optional.",
@@ -40,27 +43,4 @@ class ReqClientBase(ReqClientConfig):
         description="Password untuk otentikasi tambahan, optional.",
     )
 
-    refid: str = Field(
-        description="Referensi ID untuk transaksi, optional.",
-    )
-
     model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True)
-
-
-# SABAR Lakukan Satu Per Satu , Make Sure Dulu Semua Udah Clean, baru Jalan Lagi.
-
-
-# class ClientResConfig(BaseModel):
-#     pass
-
-
-# class ClientRespBase(ClientResConfig):
-#     pass
-
-
-# # class ClientResponse(GenericModel, Generic[T]):
-# #     """Schema respons standar untuk semua output dari API ini."""
-
-# #     success: bool = Field(..., description="Menandakan apakah request berhasil diproses.")
-# #     data: T | None = Field(None, description="Berisi data payload jika request sukses.")
-# #     error: str | None = Field(None, description="Berisi pesan error jika request gagal.")
