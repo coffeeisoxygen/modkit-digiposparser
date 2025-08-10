@@ -2,13 +2,13 @@ from ipaddress import IPv4Address
 
 import pytest
 import yaml
-from app.dependencies.dep_member import MemberRepository
 from app.exceptions.exc_member import (
     MemberAuthError,
     MemberInvalidCredentialsError,
     MemberInvalidSignatureError,
     MemberNotFoundError,
 )
+from app.feature.member.rep_member import MemberRepository
 from app.feature.member.sch_member import MemberInDB
 from app.feature.member.srv_member_auth import MemberAuthService
 from app.feature.transaction.sch_request import ReqClientBase
@@ -31,11 +31,10 @@ def member_auth_service(mock_member_repo, mock_signature_service):
 
 
 @pytest.fixture
-def real_member_repo(sample_members_yaml_path):
-    """Create real MemberRepository with test data."""
-    with open(sample_members_yaml_path, encoding="utf-8") as f:
-        members_data = yaml.safe_load(f)
-    return MemberRepository(members_data)
+def real_member_repo():
+    """Create real MemberRepository with test data from actual YAML file."""
+    # Use the actual data/members.yaml file for testing
+    return MemberRepository("data/members.yaml")
 
 
 @pytest.fixture
@@ -125,7 +124,7 @@ def valid_request():
         product="DATA",
         dest="081234567890",
         refid="REF001",
-        pin="1234",
+        pin="123467",
         password="test123",
         sign="valid_signature",
     )
