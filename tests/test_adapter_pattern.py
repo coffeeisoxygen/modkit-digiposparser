@@ -4,13 +4,17 @@ This demonstrates how the adapter pattern works with both JSON and plaintext
 responses, including validation errors and custom exceptions.
 """
 
-from app.adapters import JsonResponseAdapter, PlaintextResponseAdapter
-from app.custom.digipos_exceptions import (
+from app.exceptions.exc_digipos import (
     DigiposAuthenticationError,
     DigiposMemberNotFoundError,
     DigiposValidationError,
 )
-from app.decorators import with_json_response, with_plaintext_response
+from app.response import (
+    JsonResponseAdapter,
+    PlaintextResponseAdapter,
+    with_json_response,
+    with_plaintext_response,
+)
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, field_validator
 

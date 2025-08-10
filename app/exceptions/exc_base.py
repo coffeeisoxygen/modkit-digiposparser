@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi.responses import JSONResponse
 
 if TYPE_CHECKING:
-    from app.adapters.response_adapter import ResponseAdapter
+    from app.response.response_adapter import ResponseAdapter
 
 APP_NAME = "MODKIT-SERVICE"
 
