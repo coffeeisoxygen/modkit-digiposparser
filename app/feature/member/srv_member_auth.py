@@ -42,7 +42,8 @@ class MemberAuthService:
         """Ambil member dari DB + cek aktif."""
         member = self.member_manager.get_member_by_id(memberid)
         if not member:
-            raise MemberNotFoundError(f"Member ID '{memberid}' tidak ditemukan")
+            # Fix: Use English error message to match test expectation
+            raise MemberNotFoundError(f"Member ID '{memberid}' not found")
         if not member.is_active:
             raise MemberAuthError("Member tidak aktif")
         return member
