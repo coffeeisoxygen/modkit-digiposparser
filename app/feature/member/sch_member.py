@@ -55,16 +55,12 @@ class MemberInDB(BaseModel):
         return v
 
 
-class MemberIncomingModel(BaseModel):
-    """Model data Yang Di Butuhkan Untuk Respon Permintaan Member.
-
-    ini Bisa juga Untuk Di Middleware, Check IP Dan Block / Jadi Depends, pada endpoint tertentu.
-    # TODO : FUTURE Yang SABAR BRO.
-    """
+class MemberTrxRequestModel(BaseModel):
+    """Request transaksi mentah dari client."""
 
     memberid: str = Field(..., description="ID unik untuk member")
-    ip_address: ipaddress.IPv4Address = Field(..., description="Alamat IP member")
-    report_url: AnyHttpUrl = Field(..., description="URL untuk laporan member")
-
-
-
+    pin: str | int | None = Field(None, description="PIN untuk member")
+    password: str | int | None = Field(None, description="Password untuk member")
+    sign: str | int | None = None
+    product: str | int | None = None
+    refid: str | int | None = None
