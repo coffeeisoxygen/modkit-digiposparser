@@ -53,3 +53,18 @@ class MemberInDB(BaseModel):
         if isinstance(v, int):
             return str(v)
         return v
+
+
+class MemberIncomingModel(BaseModel):
+    """Model data Yang Di Butuhkan Untuk Respon Permintaan Member.
+
+    ini Bisa juga Untuk Di Middleware, Check IP Dan Block / Jadi Depends, pada endpoint tertentu.
+    # TODO : FUTURE Yang SABAR BRO.
+    """
+
+    memberid: str = Field(..., description="ID unik untuk member")
+    ip_address: ipaddress.IPv4Address = Field(..., description="Alamat IP member")
+    report_url: AnyHttpUrl = Field(..., description="URL untuk laporan member")
+
+
+

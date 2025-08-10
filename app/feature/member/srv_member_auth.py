@@ -9,8 +9,8 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.sch_member import MemberInDB
+from app.feature.member.sch_memberauth import MemberTrxRequestModel
 from app.feature.srv_signature import OtomaxSignatureService
-from app.feature.transaction.sch_trx_request import ReqClientBase
 from loguru import logger
 
 
@@ -38,7 +38,7 @@ class MemberAuthService:
         self.member_manager = member_manager
         self.otomax_sign_service = OtomaxSignatureService()  # Direct instantiation
 
-    def authenticate_and_verify(self, request: ReqClientBase) -> MemberInDB:
+    def authenticate_and_verify(self, request: MemberTrxRequestModel) -> MemberInDB:
         """Melakukan otentikasi member, memeriksa status, dan memvalidasi signature."""
         with logger.contextualize(
             memberid=request.memberid, operation="authenticate_and_verify"
@@ -86,7 +86,7 @@ class MemberAuthService:
             logger.info("Otentikasi member berhasil.")
             return member_db
 
-    def _verify_signature(self, request: ReqClientBase, member_db: MemberInDB):  # noqa: ARG002
+    def _verify_signature(self, request: MemberTrxRequestModel, member_db: MemberInDB):  # noqa: ARG002
         """Metode helper untuk memverifikasi signature."""
         # Validasi bahwa signature harus ada jika metode ini dipanggil
         if not request.sign:
@@ -95,8 +95,10 @@ class MemberAuthService:
 
         expected_sign = self.otomax_sign_service.generate_transaction_signature(
             memberid=request.memberid,
-            product=request.product,
-            dest=request.dest,
+            product=request.product if request.product is not None else "",
+            dest=request.refid
+            if request.refid is not None
+            else "",  # Using refid as dest
             refid=request.refid if request.refid is not None else "",
             pin=request.pin if request.pin is not None else "",
             password=request.password if request.password is not None else "",
