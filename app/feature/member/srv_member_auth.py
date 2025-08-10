@@ -42,8 +42,7 @@ class MemberAuthService:
         """Ambil member dari DB + cek aktif."""
         member = self.member_manager.get_member_by_id(memberid)
         if not member:
-            # Fix: Use English error message to match test expectation
-            raise MemberNotFoundError(f"Member ID '{memberid}' not found")
+            raise MemberNotFoundError(f"Member ID '{memberid}' tidak ditemukan")
         if not member.is_active:
             raise MemberAuthError("Member tidak aktif")
         return member
@@ -71,7 +70,7 @@ class MemberAuthService:
         return OtomaxSignatureService().generate_transaction_signature(
             memberid=request.memberid,
             product=str(request.product or ""),
-            dest=str(request.refid or ""),
+            dest=str(request.dest or ""),  # <-- FIXED: use request.dest
             refid=str(request.refid or ""),
             pin=str(request.pin or ""),
             password=str(request.password or ""),
