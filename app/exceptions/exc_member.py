@@ -14,11 +14,14 @@ class MemberAuthError(BaseExcpError):
     status_code = 401
 
 
-class MemberNotFoundError(BaseExcpError):
+class MemberNotFoundError(MemberAuthError):
     """Member ID not found in system."""
 
     default_message = "Member not found"
     status_code = 404
+
+    def __init__(self, memberid: str):
+        super().__init__(f"Member ID '{memberid}' not found")
 
 
 class MemberInvalidSignatureError(BaseExcpError):

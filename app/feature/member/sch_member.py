@@ -59,8 +59,9 @@ class MemberTrxRequestModel(BaseModel):
     """Request transaksi mentah dari client."""
 
     memberid: str = Field(..., description="ID unik untuk member")
+    dest: str = Field(..., description="Nomor tujuan atau identitas target transaksi")
+    product: str = Field(..., description="Kode produk transaksi")
     pin: str | int | None = Field(None, description="PIN untuk member")
     password: str | int | None = Field(None, description="Password untuk member")
-    sign: str | int | None = None
-    product: str | int | None = None
-    refid: str | int | None = None
+    sign: str | int | None = Field(None, description="Signature otentikasi")
+    refid: str | int | None = Field(None, description="Reference ID unik transaksi")

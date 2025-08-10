@@ -90,6 +90,7 @@ def valid_request():
     """Valid request for testing."""
     return MemberTrxRequestModel(
         memberid="TEST001",
+        dest="08123456789",
         product="DATA",
         refid="REF001",
         pin="123456",
@@ -135,12 +136,10 @@ class TestMemberAuthService:
     ):
         """Test successful authentication with valid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock the signature service method directly on the instance
-        mocker.patch.object(
-            member_auth_service.otomax_sign_service,
-            "generate_transaction_signature",
-            return_value="valid_signature",
-        )
+        # Mock OtomaxSignatureService class since it's instantiated in static method
+        mocker.patch(
+            "app.feature.srv_signature.OtomaxSignatureService"
+        ).return_value.generate_transaction_signature.return_value = "valid_signature"
 
         result = member_auth_service.authenticate_and_verify(valid_request)
 
@@ -156,11 +155,11 @@ class TestMemberAuthService:
     ):
         """Test authentication fails with invalid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock signature service to return different signature
-        mocker.patch.object(
-            member_auth_service.otomax_sign_service,
-            "generate_transaction_signature",
-            return_value="different_signature",
+        # Mock OtomaxSignatureService class to return different signature
+        mocker.patch(
+            "app.feature.srv_signature.OtomaxSignatureService"
+        ).return_value.generate_transaction_signature.return_value = (
+            "different_signature"
         )
 
         with pytest.raises(MemberInvalidSignatureError) as exc_info:
@@ -175,11 +174,13 @@ class TestMemberAuthService:
         mock_member_repo.get_member_by_id.return_value = nosign_member
         request = MemberTrxRequestModel(
             memberid="TEST003",
+            dest="08123456789",
             product="DATA",
-            dest="08123456567890",
             refid="REF001",
             pin="345678",  # Fix: sesuai dengan nosign_member fixture
-        )  # type: ignore
+            password=None,
+            sign=None,
+        )
 
         result = member_auth_service.authenticate_and_verify(request)
 
@@ -193,8 +194,9 @@ class TestMemberAuthService:
         request = MemberTrxRequestModel(
             memberid="TEST003",
             product="DATA",
-            dest="08123456567890",
+            dest="08123456789",  # <-- Add dest
             refid="REF001",
+            pin=None,
             password="test123",
         )
 

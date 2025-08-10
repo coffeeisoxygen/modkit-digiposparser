@@ -21,6 +21,7 @@ class MemberAuthService:
 
     def __init__(self, member_manager: MemberProvider):
         self.member_manager = member_manager
+        self.otomax_sign_service = OtomaxSignatureService()
 
     def authenticate_and_verify(self, request: MemberTrxRequestModel) -> MemberInDB:
         """Autentikasi member, cek status, dan validasi signature."""
@@ -77,12 +78,14 @@ class MemberAuthService:
 
     def _verify_signature(self, request: MemberTrxRequestModel, member_db: MemberInDB):
         """Verifikasi signature yang dikirim client."""
-        expected_sign = self._generate_expected_signature(request)
-        if request.sign != expected_sign:
+        expected_signature = self.otomax_sign_service.generate_transaction_signature(
+            request, member_db
+        )
+        if str(request.sign) != str(expected_signature):
             logger.error(
                 "Signature tidak valid. Diterima={}, Diharapkan={}",
                 request.sign,
-                expected_sign,
+                expected_signature,
             )
             raise MemberInvalidSignatureError("Signature tidak valid")
         logger.info("Signature valid")
