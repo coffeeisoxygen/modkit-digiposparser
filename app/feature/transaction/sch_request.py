@@ -40,6 +40,10 @@ class ReqClientBase(ReqClientConfig):
         description="Password untuk otentikasi tambahan, optional.",
     )
 
+    refid: str = Field(
+        description="Referensi ID untuk transaksi, optional.",
+    )
+
     model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True)
 
 

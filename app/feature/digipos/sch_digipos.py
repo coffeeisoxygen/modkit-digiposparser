@@ -9,7 +9,7 @@ plant endpoint (below are example Only):
 
 from enum import StrEnum
 
-from app.request.sch_request import ReqClientBase
+from app.feature.transaction.sch_request import ReqClientBase
 from pydantic import BaseModel, Field, field_validator
 
 
