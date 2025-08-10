@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.service.hasher.srv_hasher import HasherService
+from app.feature.srv_hasher import HasherService
 from fastapi import Depends
 
 

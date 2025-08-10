@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.service.signature.srv_signature import OtomaxSignatureService
+from app.feature.srv_signature import OtomaxSignatureService
 from fastapi import Depends
 
 
