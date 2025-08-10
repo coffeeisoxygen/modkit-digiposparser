@@ -1,5 +1,5 @@
 import pytest
-from app.member.rep_member import MemberRepository
+from app.feature.member.rep_member import MemberRepository
 
 
 def test_load_members(sample_members_yaml_path):
