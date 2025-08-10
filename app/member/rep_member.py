@@ -27,20 +27,8 @@ class MemberRepository:
     def list_members(self) -> list[MemberInDB]:
         return list(self._members.values())
 
-
-def main():
-    repo = MemberRepository(
-        "c:/Users/YOGA/project/otomax/modkit-digiposparser/members.yaml"
-    )
-    members = repo.list_members()
-    print(f"Loaded {len(members)} members")
-    for member in members:
-        print(member.model_dump())
-    # Validasi: cek apakah semua member punya 'memberid'
-    for member in members:
-        assert hasattr(member, "memberid"), "memberid missing in member"
-    print("All members validated.")
-
-
-if __name__ == "__main__":
-    main()
+    def check_allow_nosign(self, memberid: str) -> bool:
+        member = self.get_member_by_id(memberid)
+        if member:
+            return member.allow_nosign
+        return False
