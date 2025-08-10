@@ -1,7 +1,14 @@
 # File: src/schemas/member_schema.py
 import ipaddress
 
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, SecretStr
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    ConfigDict,
+    Field,
+    SecretStr,
+    field_validator,
+)
 
 
 class MemberInDB(BaseModel):
@@ -25,10 +32,8 @@ class MemberInDB(BaseModel):
     memberid: str = Field(
         ..., description="ID unik untuk member", min_length=5, pattern=r"^[a-zA-Z0-9]*$"
     )
-    name: str = Field(..., description="Nama member")
-    pin: SecretStr = Field(
-        ..., description="PIN untuk member", min_length=4, max_length=4
-    )
+    name: str = Field(..., description="Nama member", max_length=100)
+    pin: SecretStr = Field(..., description="PIN untuk member", min_length=6)
     password: SecretStr = Field(..., description="Password untuk member", min_length=6)
     is_active: bool = Field(default=True, description="Status keaktifan member")
     ip_address: ipaddress.IPv4Address = Field(
@@ -39,3 +44,12 @@ class MemberInDB(BaseModel):
         default=False,
         description="Apakah member diizinkan untuk hit tanpa Signature.",
     )
+
+    @field_validator("pin", "password", mode="before")
+    @classmethod
+    def validate_secret_fields(cls, v: str | None) -> str:
+        if v is None or not v:
+            raise ValueError("Field is required")
+        if isinstance(v, int):
+            return str(v)
+        return v
