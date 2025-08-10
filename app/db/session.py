@@ -46,7 +46,7 @@ class DatabaseSessionManager:
             except SQLAlchemyError:
                 await connection.rollback()
                 logger.error("Connection error occurred")
-                raise InternalServiceError("Database connection error")
+                raise InternalServiceError("Database connection error") from None
 
     @contextlib.asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncSession]:
@@ -60,7 +60,9 @@ class DatabaseSessionManager:
         except SQLAlchemyError as e:
             await session.rollback()
             logger.error(f"Session error could not be established {e}")
-            raise InternalServiceError("Session error could not be established")
+            raise InternalServiceError(
+                "Session error could not be established"
+            ) from None
         finally:
             await session.close()
 
