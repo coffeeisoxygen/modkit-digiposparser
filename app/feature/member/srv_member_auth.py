@@ -10,7 +10,7 @@ from app.exceptions.exc_member import (
 )
 from app.feature.member.sch_member import MemberInDB
 from app.feature.srv_signature import OtomaxSignatureService
-from app.feature.transaction.sch_request import ReqClientBase
+from app.feature.transaction.sch_trx_request import ReqClientBase
 from loguru import logger
 
 

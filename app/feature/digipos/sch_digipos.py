@@ -10,7 +10,8 @@ plant endpoint (below are example Only):
 from enum import StrEnum
 from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, Field, field_validator, model_validator
+from app.feature.transaction.sch_trx_request import ReqClientBase
+from pydantic import BeforeValidator, Field, field_validator, model_validator
 
 
 def validate_non_negative(v: int | None) -> int | None:
@@ -46,21 +47,21 @@ class DigiposCatAsProdEnum(StrEnum):
     HVC_VOICE_SMS = "HVC_VOICE_SMS"
 
 
-class DigiposTrxRequestBase(BaseModel):
+class DigiposTrxRequestBase(ReqClientBase):
     """Request model untuk endpoint transaksi Digipos.
 
-    validasi :
-            action harus salah satu dari enums
-            product harus salah satu dari enums
-    optional:
-        up_harga: float | None`
+    Inherit dari ReqClientBase untuk konsistensi authentication dan payload.
+
+    Additional fields:
+        action: DigposActionEnum - action to be performed
+        markup: int | None - markup dapat berupa decimal atau integer
+
+    Inherited fields dari ReqClientBase:
+        memberid, product, dest, refid, sign, pin, password
     """
 
     action: DigposActionEnum = Field(
         description="Action to be performed", examples=["list", "check", "buy"]
-    )
-    product: str = Field(
-        description="Product category", examples=["DATA", "VOICE_SMS", "DIGITAL_OTHER"]
     )
     markup: int | None = Field(
         default=0, description="Markup can be decimal or integer"
@@ -107,8 +108,9 @@ class DigiposRequestList(DigiposTrxRequestBase):
 
 class DigiposRequestCheck(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.CHECK
+    productid: str
 
 
 class DigiposRequestBuy(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.BUY
-    action: DigposActionEnum = DigposActionEnum.BUY
+    productid: str
