@@ -12,6 +12,7 @@ from typing import Any
 
 import yaml
 from app.feature.member.sch_member import MemberInDB
+from app.service.watcher.srv_watcher import FileWatcher
 from loguru import logger
 from pydantic import ValidationError
 
@@ -23,6 +24,7 @@ class MemberManager:
         self.yaml_path = Path(yaml_path)
         self._members_dict: dict[str, MemberInDB] = {}
         self._members_list: list[MemberInDB] = []
+        self._file_watcher: FileWatcher | None = None
 
     def initialize(self) -> None:
         """Load members from YAML and set up in-memory storage."""
@@ -53,6 +55,32 @@ class MemberManager:
                 logger.error("Failed to reload member data", error=str(e))
                 # Keep existing data on reload failure
                 raise
+
+    def start_watcher(self) -> None:
+        """Start file watcher for hot reload capability."""
+        if self._file_watcher is not None:
+            logger.warning("File watcher already started")
+            return
+
+        def reload_callback():
+            """Internal callback for file changes."""
+            try:
+                self.reload()
+                logger.info("🔄 Member data reloaded due to file change")
+            except Exception as e:
+                logger.error("❌ Failed to reload member data", error=str(e))
+                # Keep existing data on reload failure
+
+        self._file_watcher = FileWatcher(self.yaml_path, reload_callback)
+        self._file_watcher.start()
+        logger.info("👁️ File watcher started for member data hot reload")
+
+    def stop_watcher(self) -> None:
+        """Stop file watcher."""
+        if self._file_watcher is not None:
+            self._file_watcher.stop()
+            self._file_watcher = None
+            logger.info("👁️ File watcher stopped")
 
     def get_member(self, memberid: str) -> MemberInDB | None:
         """Get member by ID with O(1) lookup."""
