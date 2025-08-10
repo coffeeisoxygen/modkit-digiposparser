@@ -20,12 +20,15 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+# Get database config (url, echo) from dep_settings
+settings = get_settings()
+
 
 class DatabaseSessionManager:
     def __init__(self, host: str):
         self.engine: AsyncEngine | None = create_async_engine(host)
         self._sessionmaker: async_sessionmaker[AsyncSession] = async_sessionmaker(
-            autocommit=False, bind=self.engine
+            autocommit=False, echo=get_settings().database_echo, bind=self.engine
         )
 
     async def close(self):
@@ -67,11 +70,16 @@ class DatabaseSessionManager:
             await session.close()
 
 
-# Get database config (url, echo) from dep_settings
-settings = get_settings()
 sessionmanager = DatabaseSessionManager(settings.database_url)
 
 
 async def get_db_session():
+    """Get a database session.
+
+    This function provides a database session for the duration of the request.
+
+    Yields:
+        AsyncSession: The database session.
+    """
     async with sessionmanager.session() as session:
         yield session
