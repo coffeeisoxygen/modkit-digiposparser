@@ -12,7 +12,7 @@ from app.exceptions.exc_member import (
 from app.feature.member.rep_member import MemberRepository
 from app.feature.member.sch_member import MemberInDB
 from app.feature.member.srv_member_auth import MemberAuthService
-from app.feature.transaction.sch_request import ReqClientBase
+from app.feature.transaction.sch_trx_request import ReqClientBase
 from pydantic import AnyHttpUrl, SecretStr
 
 

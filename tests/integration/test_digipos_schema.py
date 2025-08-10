@@ -155,7 +155,7 @@ class TestDigiposValidation:
                 product="DATA",
                 dest="08123456789",
                 refid="REF001",
-                action="invalid_action",  # Pass as string to trigger enum validation
+                action="invalid_action",  # Pass as string to trigger enum validation # type: ignore
             )
 
         # Pydantic V2 error message for enum: "Input should be 'list', 'check' or 'buy'"
