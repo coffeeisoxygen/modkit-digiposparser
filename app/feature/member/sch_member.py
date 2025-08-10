@@ -1,13 +1,14 @@
+# File: src/schemas/member_schema.py
 import ipaddress
 
-from pydantic import AnyHttpUrl, BaseModel, Field, SecretStr, field_validator
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, SecretStr
 
 
 class MemberInDB(BaseModel):
-    model_config = {
-        "populate_by_name": True,
-        "extra": "forbid",
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        extra="forbid",
+        json_schema_extra={
             "example": {
                 "memberid": "M12345",
                 "name": "John Doe",
@@ -19,63 +20,22 @@ class MemberInDB(BaseModel):
                 "allow_nosign": False,
             }
         },
-    }
-    memberid: str = Field(..., description="ID unik untuk member")
+    )
+
+    memberid: str = Field(
+        ..., description="ID unik untuk member", min_length=5, pattern=r"^[a-zA-Z0-9]*$"
+    )
     name: str = Field(..., description="Nama member")
-    pin: SecretStr = Field(..., description="PIN untuk member")
-    password: SecretStr = Field(..., description="Password untuk member")
+    pin: SecretStr = Field(
+        ..., description="PIN untuk member", min_length=4, max_length=4
+    )
+    password: SecretStr = Field(..., description="Password untuk member", min_length=6)
     is_active: bool = Field(default=True, description="Status keaktifan member")
-    ip_address: str = Field(..., alias="ipaddress", description="Alamat IP member")
+    ip_address: ipaddress.IPv4Address = Field(
+        ..., alias="ipaddress", description="Alamat IP member"
+    )
     report_url: AnyHttpUrl = Field(..., description="URL untuk laporan member")
     allow_nosign: bool = Field(
         default=False,
-        description="Apakah member diizinkan untuk hit tanpa Signature(ini Biasanya Otomax Signature)",
+        description="Apakah member diizinkan untuk hit tanpa Signature.",
     )
-
-    @field_validator("pin", mode="before")
-    @classmethod
-    def validate_pin(cls, value: str) -> str:
-        """Validasi pin."""
-        # Accept int or str, convert to str for validation
-        value_str = str(value)
-        if not value_str.isdigit() or len(value_str) != 4:
-            raise ValueError("PIN must be a 4-digit number")
-        return value_str
-
-    @field_validator("password", mode="before")
-    @classmethod
-    def validate_password(cls, value: str) -> str:
-        """Validasi password."""
-        # Accept int or str, convert to str for validation
-        value_str = str(value)
-        if len(value_str) < 6:
-            raise ValueError("Password must be at least 6 characters long")
-        return value_str
-
-    @field_validator("memberid", mode="before")
-    @classmethod
-    def validate_memberid(cls, value: str) -> str:
-        """Validasi memberid."""
-        value_str = str(value)
-        if not value_str.isalnum() or len(value_str) < 5:
-            raise ValueError("Member ID must be alphanumeric and at least 5 characters")
-        return value_str
-
-    @field_validator("ip_address", mode="before")
-    @classmethod
-    def validate_ip_address(cls, value: str) -> str:
-        """Validasi alamat IP."""
-        try:
-            ipaddress.IPv4Address(value)  # Built-in validation
-            return str(value)
-        except ValueError:
-            raise ValueError("Invalid IPv4 address format")
-
-    @field_validator("report_url", mode="before")
-    @classmethod
-    def validate_report_url(cls, value: str) -> str:
-        """Validasi URL laporan."""
-        value_str = str(value)
-        if not value_str.startswith("http://") and not value_str.startswith("https://"):
-            raise ValueError("Report URL must start with 'http://' or 'https://'")
-        return value_str

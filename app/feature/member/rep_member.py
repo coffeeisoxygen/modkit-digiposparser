@@ -1,28 +1,20 @@
-from pathlib import Path
-
-import yaml
 from app.feature.member.sch_member import MemberInDB
 
 
 class MemberRepository:
-    def __init__(self, yaml_path: str | Path = "members.yaml"):
-        self.yaml_path = Path(yaml_path)
-        self._members: dict[str, MemberInDB] = {}  # Dict for O(1) lookup
-        self._load_members()
+    """Menyediakan akses ke data member.
 
-    def _load_members(self) -> None:
-        if not self.yaml_path.exists():
-            raise FileNotFoundError(f"Members file not found: {self.yaml_path}")
+    Tidak bergantung pada sumber data (YAML, DB, dll.).
+    """
 
-        with self.yaml_path.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-
-        for item in data.get("members", []):
-            member = MemberInDB(**item)
-            self._members[member.memberid] = member  # Dict storage
+    def __init__(self, members_data: list[MemberInDB]):
+        # Mengubah list menjadi dict di memori untuk pencarian O(1)
+        self._members: dict[str, MemberInDB] = {
+            member.memberid: member for member in members_data
+        }
 
     def get_member_by_id(self, memberid: str) -> MemberInDB | None:
-        return self._members.get(memberid)  # O(1) lookup
+        return self._members.get(memberid)
 
     def list_members(self) -> list[MemberInDB]:
         return list(self._members.values())

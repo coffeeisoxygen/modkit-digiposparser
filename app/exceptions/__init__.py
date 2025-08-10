@@ -1,11 +1,11 @@
-from app.exceptions.exc_digipos import (
-    DigiposAuthenticationError,
-    DigiposMemberNotFoundError,
+from app.exceptions.exc_member import (
     DigiposValidationError,
+    MemberAuthError,
+    MemberNotFoundError,
 )
 
 __all__ = [
-    "DigiposAuthenticationError",
-    "DigiposMemberNotFoundError",
     "DigiposValidationError",
+    "MemberAuthError",
+    "MemberNotFoundError",
 ]

@@ -1,63 +1,63 @@
-"""Digipos Domain-Specific Exceptions.
+"""Member Domain-Specific Exceptions.
 
-Provides specialized exceptions for the Digipos service with appropriate
-status codes and messages for common authentication and validation scenarios.
+Provides specialized exceptions for member authentication, validation,
+and access scenarios.
 """
 
 from app.exceptions.exc_base import BaseExcpError
 
 
-class DigiposAuthenticationError(BaseExcpError):
-    """Authentication failed for Digipos request."""
+class MemberAuthError(BaseExcpError):
+    """Authentication failed for member request."""
 
     default_message = "Authentication failed"
     status_code = 401
 
 
-class DigiposMemberNotFoundError(BaseExcpError):
+class MemberNotFoundError(BaseExcpError):
     """Member ID not found in system."""
 
     default_message = "Member not found"
     status_code = 404
 
 
-class DigiposInvalidSignatureError(BaseExcpError):
-    """Invalid signature provided in request."""
+class MemberInvalidSignatureError(BaseExcpError):
+    """Invalid signature provided in member request."""
 
     default_message = "Invalid signature"
     status_code = 401
 
 
-class DigiposInvalidCredentialsError(BaseExcpError):
-    """Invalid PIN or password provided."""
+class MemberInvalidCredentialsError(BaseExcpError):
+    """Invalid PIN or password provided for member."""
 
     default_message = "Invalid credentials"
     status_code = 401
 
 
-class DigiposIPNotAllowedError(BaseExcpError):
-    """Request from unauthorized IP address."""
+class MemberIPNotAllowedError(BaseExcpError):
+    """Request from unauthorized IP address for member."""
 
     default_message = "IP address not allowed"
     status_code = 403
 
 
-class DigiposForwardingError(BaseExcpError):
-    """Error occurred while forwarding request to Telkomsel API."""
+class MemberForwardingError(BaseExcpError):
+    """Error occurred while forwarding member request to upstream API."""
 
     default_message = "Failed to forward request to upstream API"
     status_code = 502
 
 
-class DigiposResponseProcessingError(BaseExcpError):
-    """Error occurred while processing API response."""
+class MemberResponseProcessingError(BaseExcpError):
+    """Error occurred while processing member API response."""
 
     default_message = "Failed to process API response"
     status_code = 500
 
 
-class DigiposValidationError(BaseExcpError):
-    """Request validation failed."""
+class MemberValidationError(BaseExcpError):
+    """Member request validation failed."""
 
     default_message = "Request validation failed"
     status_code = 422
