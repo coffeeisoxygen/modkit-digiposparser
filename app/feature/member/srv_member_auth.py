@@ -65,11 +65,15 @@ class MemberAuthService:
             else:
                 # Opsi otentikasi tanpa signature
                 if member_db.allow_nosign:
-                    if request.pin and str(request.pin) == member_db.pin.get_secret_value():
+                    if (
+                        request.pin
+                        and str(request.pin) == member_db.pin.get_secret_value()
+                    ):
                         logger.info("Otentikasi berhasil dengan PIN.")
                     elif (
                         request.password
-                        and str(request.password) == member_db.password.get_secret_value()
+                        and str(request.password)
+                        == member_db.password.get_secret_value()
                     ):
                         logger.info("Otentikasi berhasil dengan Password.")
                     else:
