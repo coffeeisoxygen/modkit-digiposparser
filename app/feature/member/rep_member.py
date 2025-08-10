@@ -2,20 +2,17 @@
 
 Repository pattern for member data management:
 - Constructor injection with optional file path
-- Private methods for internal operations
+- Delegates loading tasks to pure functions in srv_memberdata
 - Public interface for data access
 - Error handling with fallback behavior
 - Integration with FileWatcher via reload callback
 """
 
 from pathlib import Path
-from typing import Any
 
-import yaml
 from app.feature.member.sch_member import MemberInDB
-from app.feature.member.srv_memberdata import check_duplicate_memberids
+from app.feature.member.srv_memberdata import load_and_validate_yaml
 from loguru import logger
-from pydantic import ValidationError
 
 
 class MemberRepository:
@@ -38,7 +35,7 @@ class MemberRepository:
         self.reload()
 
     def _load_data_from_file(self) -> list[MemberInDB]:
-        """Load data from YAML file and validate it.
+        """Load data by delegating to pure function in srv_memberdata.
 
         Returns:
             List of validated MemberInDB objects or empty list if file is empty.
@@ -48,54 +45,8 @@ class MemberRepository:
             ValueError: If YAML structure is invalid or duplicates found
             ValidationError: If Pydantic validation fails
         """
-        with logger.contextualize(path=self.file_path, operation="load_from_file"):
-            # Check file existence
-            if not self.file_path.exists():
-                logger.error("YAML file not found")
-                raise FileNotFoundError(f"YAML file not found: {self.file_path}")
-
-            # Load YAML
-            try:
-                with self.file_path.open("r", encoding="utf-8") as f:
-                    data: Any = yaml.safe_load(f)
-            except yaml.YAMLError as e:
-                logger.error("Failed to parse YAML file", error=str(e))
-                raise ValueError(f"Failed to parse YAML file: {e}") from e
-
-            # Handle empty file
-            if not data or "members" not in data:
-                logger.warning("File empty or missing 'members' key")
-                return []
-
-            members_list = data["members"]
-            if not isinstance(members_list, list):
-                raise TypeError("'members' must be a list")
-
-            # Check for duplicates BEFORE Pydantic validation
-            duplicates = check_duplicate_memberids(members_list)
-            if duplicates:
-                logger.error("Duplicate memberids found", duplicates=duplicates)
-                raise ValueError(f"Duplicate memberids found: {duplicates}")
-
-            # Validate each member with Pydantic
-            validated_members: list[MemberInDB] = []
-            for i, item in enumerate(members_list):
-                try:
-                    validated_members.append(MemberInDB(**item))
-                except ValidationError as e:
-                    logger.error(
-                        "Member validation failed", index=i, item=item, error=str(e)
-                    )
-                    raise ValueError(
-                        f"Member validation failed at index {i}: {e}"
-                    ) from e
-
-            logger.info(
-                "Successfully loaded members from file",
-                count=len(validated_members),
-                member_ids=[m.memberid for m in validated_members[:5]],  # Log first 5
-            )
-            return validated_members
+        # Delegate all loading logic to pure function
+        return load_and_validate_yaml(self.file_path)
 
     def reload(self) -> None:
         """Reload all data from file and update internal state.

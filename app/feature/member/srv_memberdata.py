@@ -1,9 +1,8 @@
 """Member Data Services.
 
-Pure data operations for member management:
+Pure utility functions for member data operations:
 - Duplicate checking
-- Data reloading
-- YAML processing
+- YAML loading and validation
 """
 
 from pathlib import Path
@@ -31,7 +30,26 @@ def check_duplicate_memberids(members_data: list[dict]) -> list[str]:
 
 
 def load_and_validate_yaml(yaml_path: Path) -> list[MemberInDB]:
-    """Load YAML file and validate each member with Pydantic."""
+    """Load YAML file and validate each member with Pydantic.
+
+    Pure function that handles complete YAML loading pipeline:
+    - File existence check
+    - YAML parsing
+    - Structure validation
+    - Duplicate checking
+    - Pydantic validation
+
+    Args:
+        yaml_path: Path to YAML file to load
+
+    Returns:
+        List of validated MemberInDB objects
+
+    Raises:
+        FileNotFoundError: If YAML file doesn't exist
+        ValueError: If YAML structure is invalid or duplicates found
+        ValidationError: If Pydantic validation fails
+    """
     with logger.contextualize(path=yaml_path, operation="load_yaml"):
         # Check file existence
         if not yaml_path.exists():
@@ -78,26 +96,3 @@ def load_and_validate_yaml(yaml_path: Path) -> list[MemberInDB]:
             "Successfully loaded and validated members", count=len(validated_members)
         )
         return validated_members
-
-
-def reload_member_data(
-    yaml_path: Path,
-) -> tuple[dict[str, MemberInDB], list[MemberInDB]]:
-    """Reload member data and return both dict and list representations."""
-    with logger.contextualize(operation="reload_data"):
-        logger.info("Reloading member data from YAML")
-
-        # Load and validate
-        members = load_and_validate_yaml(yaml_path)
-
-        # Create both storage formats
-        members_dict = {m.memberid: m for m in members}
-        members_list = members.copy()
-
-        logger.info(
-            "Member data reload completed",
-            count=len(members),
-            member_ids=[m.memberid for m in members[:5]],  # Log first 5 IDs
-        )
-
-        return members_dict, members_list
