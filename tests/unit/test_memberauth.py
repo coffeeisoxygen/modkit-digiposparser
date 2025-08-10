@@ -1,6 +1,7 @@
 from ipaddress import IPv4Address
 
 import pytest
+import yaml
 from app.dependencies.dep_member import MemberRepository
 from app.exceptions.exc_member import (
     MemberAuthError,
@@ -32,7 +33,9 @@ def member_auth_service(mock_member_repo, mock_signature_service):
 @pytest.fixture
 def real_member_repo(sample_members_yaml_path):
     """Create real MemberRepository with test data."""
-    return MemberRepository(sample_members_yaml_path)
+    with open(sample_members_yaml_path, encoding="utf-8") as f:
+        members_data = yaml.safe_load(f)
+    return MemberRepository(members_data)
 
 
 @pytest.fixture

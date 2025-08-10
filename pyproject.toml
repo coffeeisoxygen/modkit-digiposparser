@@ -215,6 +215,7 @@ markers = [
     "api: mark test as API test",
     "database: mark test as database-related",
     "e2e: mark end to end testing",
+    "quick: mark test as quick to run",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
