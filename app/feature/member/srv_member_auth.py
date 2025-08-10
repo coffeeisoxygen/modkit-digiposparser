@@ -34,13 +34,9 @@ class MemberProvider(Protocol):
 class MemberAuthService:
     """Layanan yang mengurus otentikasi member dan validasi signature."""
 
-    def __init__(
-        self,
-        member_manager: MemberProvider,
-        otomax_sign_service: OtomaxSignatureService,
-    ):
+    def __init__(self, member_manager: MemberProvider):
         self.member_manager = member_manager
-        self.otomax_sign_service = otomax_sign_service
+        self.otomax_sign_service = OtomaxSignatureService()  # Direct instantiation
 
     def authenticate_and_verify(self, request: ReqClientBase) -> MemberInDB:
         """Melakukan otentikasi member, memeriksa status, dan memvalidasi signature."""

@@ -3,11 +3,9 @@ from app.dependencies.dep_settings import (
     DigiposConfigDep,
     DigiposResponseDep,
 )
-from app.dependencies.dep_siganture import OtomaxSignServiceDep
 
 __all__ = [
     "AppConfigDep",
     "DigiposConfigDep",
     "DigiposResponseDep",
-    "OtomaxSignServiceDep",
 ]
