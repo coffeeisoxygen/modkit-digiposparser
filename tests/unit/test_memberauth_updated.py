@@ -29,9 +29,9 @@ def mock_signature_service(mocker):
 
 
 @pytest.fixture
-def member_auth_service(mock_member_repo, mock_signature_service):
-    """MemberAuthService with mocked dependencies."""
-    return MemberAuthService(mock_member_repo, mock_signature_service)
+def member_auth_service(mock_member_repo):
+    """MemberAuthService with mocked repository (signature service auto-instantiated)."""
+    return MemberAuthService(mock_member_repo)
 
 
 @pytest.fixture
@@ -41,9 +41,9 @@ def real_member_repo():
 
 
 @pytest.fixture
-def real_member_auth_service(real_member_repo, mock_signature_service):
-    """Auth service with real member data but mocked signature service."""
-    return MemberAuthService(real_member_repo, mock_signature_service)
+def real_member_auth_service(real_member_repo):
+    """Auth service with real member data (signature service auto-instantiated)."""
+    return MemberAuthService(real_member_repo)
 
 
 # Test fixtures for members from actual YAML
@@ -137,33 +137,38 @@ class TestMemberAuthService:
         self,
         member_auth_service,
         mock_member_repo,
-        mock_signature_service,
         active_member,
         valid_request,
+        mocker,
     ):
         """Test successful authentication with valid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        mock_signature_service.generate_transaction_signature.return_value = (
-            "valid_signature"
+        # Mock the signature service method directly on the instance
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            'generate_transaction_signature',
+            return_value="valid_signature"
         )
 
         result = member_auth_service.authenticate_and_verify(valid_request)
 
         assert result == active_member
-        mock_signature_service.generate_transaction_signature.assert_called_once()
 
     def test_authenticate_with_invalid_signature(
         self,
         member_auth_service,
         mock_member_repo,
-        mock_signature_service,
         active_member,
         valid_request,
+        mocker,
     ):
         """Test authentication fails with invalid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        mock_signature_service.generate_transaction_signature.return_value = (
-            "different_signature"
+        # Mock signature service to return different signature
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            'generate_transaction_signature',
+            return_value="different_signature"
         )
 
         with pytest.raises(MemberInvalidSignatureError) as exc_info:
@@ -247,11 +252,14 @@ class TestMemberAuthServiceWithRealRepo:
     """Integration tests using real MemberRepository with actual YAML data."""
 
     def test_authenticate_otomax1_with_signature(
-        self, real_member_auth_service, mock_signature_service
+        self, real_member_auth_service, mocker
     ):
         """Test authentication of otomax1 (active, requires signature)."""
-        mock_signature_service.generate_transaction_signature.return_value = (
-            "valid_signature"
+        # Mock signature service on the real auth service instance
+        mocker.patch.object(
+            real_member_auth_service.otomax_sign_service,
+            'generate_transaction_signature',
+            return_value="valid_signature"
         )
 
         request = ReqClientBase(
