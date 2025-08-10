@@ -1,14 +1,13 @@
-# File: src/services/member_auth_service.py
+# Member Authentication Service
 
-# Mengimpor semua custom exceptions yang dibutuhkan dari desainmu
 from app.exceptions.exc_member import (
     MemberAuthError,
     MemberInvalidCredentialsError,
     MemberInvalidSignatureError,
     MemberNotFoundError,
 )
-from app.feature.member.rep_member import MemberRepository
 from app.feature.member.sch_member import MemberInDB
+from app.feature.member.srv_member_manager import MemberManager
 from app.feature.transaction.sch_request import ReqClientBase
 from app.service.signature.srv_signature import OtomaxSignatureService
 from loguru import logger
@@ -19,10 +18,10 @@ class MemberAuthService:
 
     def __init__(
         self,
-        member_repo: MemberRepository,
+        member_manager: MemberManager,
         otomax_sign_service: OtomaxSignatureService,
     ):
-        self.member_repo = member_repo
+        self.member_manager = member_manager
         self.otomax_sign_service = otomax_sign_service
 
     def authenticate_and_verify(self, request: ReqClientBase) -> MemberInDB:
@@ -33,7 +32,7 @@ class MemberAuthService:
             logger.info("Memulai proses otentikasi.")
 
             # Langkah 1: Ambil data member dan cek status keaktifan
-            member_db = self.member_repo.get_member_by_id(request.memberid)
+            member_db = self.member_manager.get_member(request.memberid)
             if not member_db:
                 logger.warning("Percobaan otentikasi gagal: Member tidak ditemukan.")
                 raise MemberNotFoundError(
@@ -52,9 +51,12 @@ class MemberAuthService:
             else:
                 # Opsi otentikasi tanpa signature
                 if member_db.allow_nosign:
-                    if request.pin and request.pin == member_db.pin:
+                    if request.pin and request.pin == member_db.pin.get_secret_value():
                         logger.info("Otentikasi berhasil dengan PIN.")
-                    elif request.password and request.password == member_db.password:
+                    elif (
+                        request.password
+                        and request.password == member_db.password.get_secret_value()
+                    ):
                         logger.info("Otentikasi berhasil dengan Password.")
                     else:
                         logger.warning("PIN atau Password tidak valid.")
