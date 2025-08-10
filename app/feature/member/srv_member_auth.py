@@ -1,5 +1,7 @@
 # Member Authentication Service
 
+from typing import Protocol, runtime_checkable
+
 from app.exceptions.exc_member import (
     MemberAuthError,
     MemberInvalidCredentialsError,
@@ -7,10 +9,26 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.sch_member import MemberInDB
-from app.feature.member.srv_member_manager import MemberManager
 from app.feature.transaction.sch_request import ReqClientBase
 from app.service.signature.srv_signature import OtomaxSignatureService
 from loguru import logger
+
+
+@runtime_checkable
+class MemberProvider(Protocol):
+    """Protocol for member data providers (Manager, Repository, etc)."""
+
+    def get_member_by_id(self, memberid: str) -> MemberInDB | None:
+        """Get member by ID."""
+        ...
+
+    def is_member_active(self, memberid: str) -> bool:
+        """Check if member is active."""
+        ...
+
+    def check_allow_nosign(self, memberid: str) -> bool:
+        """Check if member allows nosign auth."""
+        ...
 
 
 class MemberAuthService:
@@ -18,7 +36,7 @@ class MemberAuthService:
 
     def __init__(
         self,
-        member_manager: MemberManager,
+        member_manager: MemberProvider,
         otomax_sign_service: OtomaxSignatureService,
     ):
         self.member_manager = member_manager
@@ -32,7 +50,7 @@ class MemberAuthService:
             logger.info("Memulai proses otentikasi.")
 
             # Langkah 1: Ambil data member dan cek status keaktifan
-            member_db = self.member_manager.get_member(request.memberid)
+            member_db = self.member_manager.get_member_by_id(request.memberid)
             if not member_db:
                 logger.warning("Percobaan otentikasi gagal: Member tidak ditemukan.")
                 raise MemberNotFoundError(
