@@ -65,11 +65,11 @@ class MemberAuthService:
             else:
                 # Opsi otentikasi tanpa signature
                 if member_db.allow_nosign:
-                    if request.pin and request.pin == member_db.pin.get_secret_value():
+                    if request.pin and str(request.pin) == member_db.pin.get_secret_value():
                         logger.info("Otentikasi berhasil dengan PIN.")
                     elif (
                         request.password
-                        and request.password == member_db.password.get_secret_value()
+                        and str(request.password) == member_db.password.get_secret_value()
                     ):
                         logger.info("Otentikasi berhasil dengan Password.")
                     else:
@@ -95,13 +95,13 @@ class MemberAuthService:
 
         expected_sign = self.otomax_sign_service.generate_transaction_signature(
             memberid=request.memberid,
-            product=request.product if request.product is not None else "",
-            dest=request.refid
+            product=str(request.product) if request.product is not None else "",
+            dest=str(request.refid)
             if request.refid is not None
             else "",  # Using refid as dest
-            refid=request.refid if request.refid is not None else "",
-            pin=request.pin if request.pin is not None else "",
-            password=request.password if request.password is not None else "",
+            refid=str(request.refid) if request.refid is not None else "",
+            pin=str(request.pin) if request.pin is not None else "",
+            password=str(request.password) if request.password is not None else "",
         )
 
         if request.sign != expected_sign:

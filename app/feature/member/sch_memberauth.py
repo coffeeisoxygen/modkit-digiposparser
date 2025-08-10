@@ -6,11 +6,11 @@ class MemberTrxRequestModel(BaseModel):
     """Model data Yang Di Butuhkan Untuk Transaksi."""
 
     memberid: str = Field(..., description="ID unik untuk member")
-    pin: str | None = Field(None, description="PIN untuk member")
-    password: str | None = Field(None, description="Password untuk member")
-    sign: str | None = None
-    product: str | None = None
-    refid: str | None = None
+    pin: str | int | None = Field(None, description="PIN untuk member")
+    password: str | int | None = Field(None, description="Password untuk member")
+    sign: str | int | None = None
+    product: str | int | None = None
+    refid: str | int | None = None
 
 
 class MemberTrxAuthModel(MemberTrxRequestModel):
