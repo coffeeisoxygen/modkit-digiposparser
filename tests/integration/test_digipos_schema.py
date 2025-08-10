@@ -29,7 +29,7 @@ class TestDigiposSchemaInheritance:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
 
         # Verify inheritance fields
@@ -55,7 +55,7 @@ class TestDigiposSchemaInheritance:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
         assert request_minimal.minday is None
         assert request_minimal.maxday is None
@@ -67,7 +67,7 @@ class TestDigiposSchemaInheritance:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
             minday=1,
         )
         assert request_partial.minday == 1
@@ -79,7 +79,7 @@ class TestDigiposSchemaInheritance:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
             minday=1,
             maxday=30,
             markup=1000,
@@ -97,6 +97,7 @@ class TestDigiposSchemaInheritance:
             refid="REF001",
             productid="PRD001",
             markup=500,
+            action=DigposActionEnum.CHECK,
         )
 
         assert request.action == DigposActionEnum.CHECK
@@ -112,6 +113,7 @@ class TestDigiposSchemaInheritance:
             refid="REF001",
             productid="PRD001",
             markup=500,
+            action=DigposActionEnum.BUY,
         )
 
         assert request.action == DigposActionEnum.BUY
@@ -131,7 +133,7 @@ class TestDigiposValidation:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
         assert request.action == DigposActionEnum.LIST
 
@@ -141,7 +143,7 @@ class TestDigiposValidation:
             product=DigiposCatAsProdEnum.DATA,
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
         assert request_data.product == "DATA"
 
@@ -153,34 +155,68 @@ class TestDigiposValidation:
                 product="DATA",
                 dest="08123456789",
                 refid="REF001",
-                action="invalid_action",
+                action="invalid_action",  # Pass as string to trigger enum validation
             )
 
+        # Pydantic V2 error message for enum: "Input should be 'list', 'check' or 'buy'"
         assert "Input should be 'list', 'check' or 'buy'" in str(exc_info.value)
 
     def test_negative_values_validation(self):
         """Test that negative values are properly handled."""
-        # Test negative minday should be converted to None or raise error
+        # Test negative minday should raise error
         with pytest.raises(ValidationError):
             DigiposRequestList(
                 memberid="test123",
                 product="DATA",
                 dest="08123456789",
                 refid="REF001",
-                action="list",
+                action=DigposActionEnum.LIST,
                 minday=-1,
             )
 
-        # Test negative markup should be converted to None or raise error
+        # Test negative maxday should raise error
         with pytest.raises(ValidationError):
             DigiposRequestList(
                 memberid="test123",
                 product="DATA",
                 dest="08123456789",
                 refid="REF001",
-                action="list",
-                markup=-100,
+                action=DigposActionEnum.LIST,
+                maxday=-5,
             )
+
+        # Test negative minprice should raise error
+        with pytest.raises(ValidationError):
+            DigiposRequestList(
+                memberid="test123",
+                product="DATA",
+                dest="08123456789",
+                refid="REF001",
+                action=DigposActionEnum.LIST,
+                minprice=-10,
+            )
+
+        # Test negative maxprice should raise error
+        with pytest.raises(ValidationError):
+            DigiposRequestList(
+                memberid="test123",
+                product="DATA",
+                dest="08123456789",
+                refid="REF001",
+                action=DigposActionEnum.LIST,
+                maxprice=-20,
+            )
+
+        # Markup can be negative, should NOT raise error
+        request = DigiposRequestList(
+            memberid="test123",
+            product="DATA",
+            dest="08123456789",
+            refid="REF001",
+            action=DigposActionEnum.LIST,
+            markup=-100,
+        )
+        assert request.markup == -100
 
     def test_dest_pattern_validation(self):
         """Test that dest field validates as numeric string."""
@@ -190,7 +226,7 @@ class TestDigiposValidation:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
         assert request_valid.dest == "08123456789"
 
@@ -201,7 +237,7 @@ class TestDigiposValidation:
                 product="DATA",
                 dest="invalid_dest",
                 refid="REF001",
-                action="list",
+                action=DigposActionEnum.LIST,
             )
 
         assert "String should match pattern" in str(exc_info.value)
@@ -229,7 +265,7 @@ class TestDigiposAuthCompatibility:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
             pin="111222",  # Valid PIN from test data
         )
 
@@ -254,7 +290,7 @@ class TestDigiposAuthCompatibility:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="check",
+            action=DigposActionEnum.CHECK,
             productid="PRD001",
             sign="valid_signature",
         )
@@ -272,7 +308,7 @@ class TestDigiposAuthCompatibility:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="buy",
+            action=DigposActionEnum.BUY,
             productid="PRD001",
             markup=500,
             pin="123456",
@@ -318,7 +354,7 @@ class TestDigiposRealWorldScenarios:
             product="DATA",
             dest="08123456789",
             refid="TRX001",
-            action="list",
+            action=DigposActionEnum.LIST,
         )
 
         assert request.action == "list"
@@ -335,7 +371,7 @@ class TestDigiposRealWorldScenarios:
             product="DATA",
             dest="08123456789",
             refid="TRX002",
-            action="list",
+            action=DigposActionEnum.LIST,
             minday=7,
             maxday=30,
         )
@@ -350,7 +386,7 @@ class TestDigiposRealWorldScenarios:
             product="DATA",
             dest="08123456789",
             refid="TRX003",
-            action="buy",
+            action=DigposActionEnum.BUY,
             productid="DATA_5GB_30D",
             markup=1000,
             pin="111222",
@@ -368,7 +404,7 @@ class TestDigiposRealWorldScenarios:
             product="DATA",
             dest="08123456789",
             refid="REF001",
-            action="list",
+            action=DigposActionEnum.LIST,
             minday=1,
             maxday=30,
         )
