@@ -1,5 +1,4 @@
 from app.dependencies.dep_hasher import HasherServiceDep
-from app.dependencies.dep_member import MemberRepoDep
 from app.dependencies.dep_settings import (
     AppConfigDep,
     DigiposConfigDep,
@@ -12,6 +11,5 @@ __all__ = [
     "DigiposConfigDep",
     "DigiposResponseDep",
     "HasherServiceDep",
-    "MemberRepoDep",
     "OtomaxSignServiceDep",
 ]

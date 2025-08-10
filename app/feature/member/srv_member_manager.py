@@ -1,86 +1,29 @@
-"""Member Manager Service.
+"""Member Manager Service - New Clean Version.
 
-Simplified single-responsibility service that handles all member-related operations:
-- Loading from YAML
+Pure storage and access service for member data:
 - In-memory storage with O(1) lookup
-- Validation with Pydantic
-- Reload capability for FileWatcher integration
+- Access methods (get, list, count, etc.)
+- No file operations, no validation, no watching
 """
 
-from pathlib import Path
-from typing import Any
-
-import yaml
 from app.feature.member.sch_member import MemberInDB
-from app.service.watcher.srv_watcher import FileWatcher
 from loguru import logger
-from pydantic import ValidationError
 
 
 class MemberManager:
-    """Manages member data lifecycle - loading, validation, and access."""
+    """Pure storage and access manager for member data."""
 
-    def __init__(self, yaml_path: str | Path):
-        self.yaml_path = Path(yaml_path)
+    def __init__(self):
         self._members_dict: dict[str, MemberInDB] = {}
         self._members_list: list[MemberInDB] = []
-        self._file_watcher: FileWatcher | None = None
 
-    def initialize(self) -> None:
-        """Load members from YAML and set up in-memory storage."""
-        with logger.contextualize(path=self.yaml_path, operation="initialize"):
-            logger.info("Initializing member data")
-
-            # Load and validate members
-            members = self._load_and_validate_yaml()
-
-            # Store in both dict (for O(1) lookup) and list (for iteration)
-            self._members_dict = {m.memberid: m for m in members}
-            self._members_list = members
-
-            logger.info(
-                "Successfully initialized member data",
-                count=len(members),
-                member_ids=[m.memberid for m in members[:5]],  # Log first 5 IDs
-            )
-
-    def reload(self) -> None:
-        """Reload members from YAML - called by FileWatcher."""
-        with logger.contextualize(operation="reload"):
-            logger.info("Reloading member data due to file change")
-            try:
-                self.initialize()
-                logger.info("Member data reload completed successfully")
-            except Exception as e:
-                logger.error("Failed to reload member data", error=str(e))
-                # Keep existing data on reload failure
-                raise
-
-    def start_watcher(self) -> None:
-        """Start file watcher for hot reload capability."""
-        if self._file_watcher is not None:
-            logger.warning("File watcher already started")
-            return
-
-        def reload_callback():
-            """Internal callback for file changes."""
-            try:
-                self.reload()
-                logger.info("🔄 Member data reloaded due to file change")
-            except Exception as e:
-                logger.error("❌ Failed to reload member data", error=str(e))
-                # Keep existing data on reload failure
-
-        self._file_watcher = FileWatcher(self.yaml_path, reload_callback)
-        self._file_watcher.start()
-        logger.info("👁️ File watcher started for member data hot reload")
-
-    def stop_watcher(self) -> None:
-        """Stop file watcher."""
-        if self._file_watcher is not None:
-            self._file_watcher.stop()
-            self._file_watcher = None
-            logger.info("👁️ File watcher stopped")
+    def update_data(
+        self, members_dict: dict[str, MemberInDB], members_list: list[MemberInDB]
+    ) -> None:
+        """Update internal storage with new data."""
+        self._members_dict = members_dict
+        self._members_list = members_list
+        logger.info("Member data updated in storage", count=len(members_dict))
 
     def get_member(self, memberid: str) -> MemberInDB | None:
         """Get member by ID with O(1) lookup."""
@@ -104,41 +47,16 @@ class MemberManager:
         member = self.get_member(memberid)
         return member is not None and member.allow_nosign
 
-    def _load_and_validate_yaml(self) -> list[MemberInDB]:
-        """Load YAML file and validate each member with Pydantic."""
-        # Check file existence
-        if not self.yaml_path.exists():
-            logger.error("YAML file not found")
-            raise FileNotFoundError(f"YAML file not found: {self.yaml_path}")
+    def get_member_ids(self) -> list[str]:
+        """Get all member IDs."""
+        return list(self._members_dict.keys())
 
-        # Load YAML
-        try:
-            with self.yaml_path.open("r", encoding="utf-8") as f:
-                data: Any = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            logger.error("Failed to parse YAML file", error=str(e))
-            raise ValueError(f"Failed to parse YAML file: {e}") from e
+    def has_member(self, memberid: str) -> bool:
+        """Check if member exists."""
+        return memberid in self._members_dict
 
-        # Validate structure
-        if not isinstance(data, dict) or "members" not in data:
-            raise ValueError("YAML must contain 'members' key")
-
-        members_list = data["members"]
-        if not isinstance(members_list, list):
-            raise TypeError("'members' must be a list")
-
-        # Validate each member with Pydantic
-        validated_members: list[MemberInDB] = []
-        for i, item in enumerate(members_list):
-            try:
-                validated_members.append(MemberInDB(**item))
-            except ValidationError as e:
-                logger.error(
-                    "Member validation failed", index=i, item=item, error=str(e)
-                )
-                raise ValueError(f"Member validation failed at index {i}: {e}") from e
-
-        if not validated_members:
-            logger.warning("No valid members found in YAML file")
-
-        return validated_members
+    def clear_data(self) -> None:
+        """Clear all stored data."""
+        self._members_dict.clear()
+        self._members_list.clear()
+        logger.info("Member data cleared from storage")
