@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting application lifespan...")
 
     # Initialize member management
-    yaml_path = Path("tests/.sample/test_members.yaml")  # Use test data for now
+    yaml_path = Path("data/members.yaml")  # Use test data for now
 
     # Create and initialize member manager
     app.state.member_manager = MemberManager(yaml_path)
