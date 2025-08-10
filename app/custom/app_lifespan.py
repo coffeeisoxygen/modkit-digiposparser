@@ -19,7 +19,7 @@ member_watcher = FileWatcher(file_path=MEMBER_YAML_PATH, callback=member_repo.re
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # noqa: RUF029
+async def lifespan(app: FastAPI):
     """Application lifespan context manager - pure orchestration only."""
     logger.info("🚀 Starting application lifespan...")
 

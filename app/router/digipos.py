@@ -1,9 +1,8 @@
 import httpx
-from fastapi import APIRouter, Depends, Response, status
-from fastapi.responses import JSONResponse
 
 # Impor Enum, Schema, dan Response Model kita
 from app.schemas.digipos import ClientResponse, DigiposCategory, DigiposListParams
+from fastapi import APIRouter, Depends, Response, status
 
 # --- Konfigurasi ---
 TARGET_API_BASE_URL = "http://10.0.0.3:10003"

@@ -69,9 +69,12 @@ class MemberAuthService:
             else:
                 # Opsi otentikasi tanpa signature
                 if member_db.allow_nosign:
-                    if request.pin and request.pin == member_db.pin:
+                    if request.pin and request.pin == member_db.pin.get_secret_value():
                         logger.info("Otentikasi berhasil dengan PIN.")
-                    elif request.password and request.password == member_db.password:
+                    elif (
+                        request.password
+                        and request.password == member_db.password.get_secret_value()
+                    ):
                         logger.info("Otentikasi berhasil dengan Password.")
                     else:
                         logger.warning("PIN atau Password tidak valid.")
@@ -87,7 +90,7 @@ class MemberAuthService:
             logger.info("Otentikasi member berhasil.")
             return member_db
 
-    def _verify_signature(self, request: ReqClientBase, member_db: MemberInDB):
+    def _verify_signature(self, request: ReqClientBase, member_db: MemberInDB):  # noqa: ARG002
         """Metode helper untuk memverifikasi signature."""
         # Validasi bahwa signature harus ada jika metode ini dipanggil
         if not request.sign:
