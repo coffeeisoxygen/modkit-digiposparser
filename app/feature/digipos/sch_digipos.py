@@ -46,12 +46,10 @@ class DigiposTrxRequestBase(BaseModel):
     """
 
     action: DigposActionEnum = Field(
-        description="Action to be performed, exol",
-        examples=["list", "check", "buy"]
+        description="Action to be performed, exol", examples=["list", "check", "buy"]
     )
     product: str = Field(
-        description="Product category",
-        examples=["DATA", "VOICE_SMS", "DIGITAL_OTHER"]
+        description="Product category", examples=["DATA", "VOICE_SMS", "DIGITAL_OTHER"]
     )
     markup: float | None = Field(
         default=0, description="Markup can be decimal or integer"
@@ -79,15 +77,15 @@ class DigiposTrxRequestBase(BaseModel):
 
 
 class DigiposRequestList(DigiposTrxRequestBase):
-    pass
+    action: DigposActionEnum = DigposActionEnum.LIST
 
 
 class DigiposRequestCheck(DigiposTrxRequestBase):
-    pass
+    action: DigposActionEnum = DigposActionEnum.CHECK
 
 
 class DigiposRequestBuy(DigiposTrxRequestBase):
-    pass
+    action: DigposActionEnum = DigposActionEnum.BUY
 
 
 # class DigiposListRequest(ReqClientBase):

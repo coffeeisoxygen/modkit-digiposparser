@@ -23,12 +23,6 @@ def mock_member_repo(mocker):
 
 
 @pytest.fixture
-def mock_signature_service(mocker):
-    """Mock signature service for unit tests."""
-    return mocker.Mock()
-
-
-@pytest.fixture
 def member_auth_service(mock_member_repo):
     """MemberAuthService with mocked repository (signature service auto-instantiated)."""
     return MemberAuthService(mock_member_repo)
@@ -146,8 +140,8 @@ class TestMemberAuthService:
         # Mock the signature service method directly on the instance
         mocker.patch.object(
             member_auth_service.otomax_sign_service,
-            'generate_transaction_signature',
-            return_value="valid_signature"
+            "generate_transaction_signature",
+            return_value="valid_signature",
         )
 
         result = member_auth_service.authenticate_and_verify(valid_request)
@@ -167,8 +161,8 @@ class TestMemberAuthService:
         # Mock signature service to return different signature
         mocker.patch.object(
             member_auth_service.otomax_sign_service,
-            'generate_transaction_signature',
-            return_value="different_signature"
+            "generate_transaction_signature",
+            return_value="different_signature",
         )
 
         with pytest.raises(MemberInvalidSignatureError) as exc_info:
@@ -258,8 +252,8 @@ class TestMemberAuthServiceWithRealRepo:
         # Mock signature service on the real auth service instance
         mocker.patch.object(
             real_member_auth_service.otomax_sign_service,
-            'generate_transaction_signature',
-            return_value="valid_signature"
+            "generate_transaction_signature",
+            return_value="valid_signature",
         )
 
         request = ReqClientBase(
