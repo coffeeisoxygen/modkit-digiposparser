@@ -5,12 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "aiosqlite>=0.21.0",
-    "alembic>=1.16.4",
     "argon2-cffi>=25.1.0",
     "fastapi[all]>=0.116.1",
     "loguru>=0.7.3",
-    "sqlalchemy>=2.0.42",
     "watchdog>=6.0.0",
 ]
 
@@ -234,24 +231,3 @@ norecursedirs = [
     ".pytest_cache",
     ".reports",
 ]
-
-[tool.alembic]
-script_location = "%(here)s/alembic"
-
-prepend_sys_path = [
-    "."
-]
-
-# Tambahkan post_write_hook untuk Ruff agar file migrasi baru di-format secara otomatis
-[[tool.alembic.post_write_hooks]]
-name = "ruff"
-type = "module"
-module = "ruff"
-options = "check --fix REVISION_SCRIPT_FILENAME"
-
-# Tambahkan post_write_hook untuk black jika kamu ingin
-# [[tool.alembic.post_write_hooks]]
-# name = "black"
-# type = "console_scripts"
-# entrypoint = "black"
-# options = "REVISION_SCRIPT_FILENAME"
