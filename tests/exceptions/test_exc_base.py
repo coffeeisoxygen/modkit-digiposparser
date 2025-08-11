@@ -144,7 +144,7 @@ class TestAppExceptionError:
         mock_adapter = MockAdapter()
 
         # Act
-        result = error.adapt_to(mock_adapter)
+        result = error.adapt_to(mock_adapter)  # type: ignore
 
         # Assert
         assert result == "Adapted: Test error"

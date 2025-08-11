@@ -5,10 +5,11 @@ error formatting, and template rendering.
 """
 
 import pytest
-from app.exceptions.canvas.exc_base import AppExceptionError, ServiceError
-from app.exceptions.canvas.exc_html_adapter import (
+from app.exceptions import (
+    AppExceptionError,
     ConfigErrorAdapter,
     HtmlResponseAdapter,
+    ServiceError,
 )
 from fastapi.responses import HTMLResponse
 
