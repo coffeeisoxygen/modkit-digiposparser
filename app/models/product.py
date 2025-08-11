@@ -34,6 +34,6 @@ class Product(Base):
     )
     provider: Mapped["Provider"] = relationship("Provider", back_populates="products")
 
-    apicommands: Mapped[list["ApiCommand"]] = relationship(
+    api_commands: Mapped[list["ApiCommand"]] = relationship(
         "ApiCommand", back_populates="product"
     )

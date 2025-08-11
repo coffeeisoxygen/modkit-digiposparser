@@ -32,7 +32,7 @@ class ApiCommand(Base):
     )
 
     # relasi opsional untuk kemudahan query
-    product = relationship("Product", back_populates="apicommands")
+    product = relationship("Product", back_populates="api_commands")
     module = relationship("Module")
 
 
