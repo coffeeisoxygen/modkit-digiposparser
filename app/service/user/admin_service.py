@@ -57,4 +57,4 @@ class AdminService:
     @staticmethod
     def _verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verifikasi password dengan hasher."""
-        return Hasher.verify_password(plain_password, hashed_password)
+        return Hasher.verify_password(hashed_password, plain_password)
