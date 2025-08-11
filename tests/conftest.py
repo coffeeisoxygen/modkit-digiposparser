@@ -210,16 +210,17 @@ def otomax_signature_sample_data():
     """
     Fixture for actual member data and expected signature used in
     test_otomax_signature_should_match_actual_generated_sign.
+    Updated with real data from otomax: memberid=AKSES01|pin=777999|password=vps777999
     """
     return {
-        "memberid": "vps",
+        "memberid": "AKSES01",
         "pin": "777999",
         "password": "vps777999",
         "product": "CLPDATA",
         "qty": "1",  # not used in signature
         "dest": "081295221639",
-        "refid": "3041094LIST",
-        "expected_sign": "FzqLAOMAa2yJKA7e-w_fSQkXjrY",
+        "refid": "3041109LIST",
+        "expected_sign": "vlwQzSqAEJ6qhUbuqUK7tjnm-h4",
     }
 
 
