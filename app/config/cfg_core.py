@@ -1,6 +1,7 @@
 from app.config.cfg_app import AppConfig
 from app.config.cfg_digipos_credential import DigiposCoreConfig
 from app.config.cfg_digipos_response import DigiposRespConfig
+from app.config.cfg_jwt import JwtConfig
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,7 @@ class Settings(BaseSettings):
 
     app: AppConfig
     digipos: DigiposCoreConfig
+    jwt: JwtConfig
     digipos_response: DigiposRespConfig
     database_url: str = "sqlite+aiosqlite:///./app.db"
     database_echo: bool = False
