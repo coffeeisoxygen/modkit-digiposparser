@@ -1,7 +1,7 @@
 """service untuk seeding seeding admin dan lain lain."""
 
-from app.utils.hasher import Hasher
 from app.repos.rep_user import UserRepository
+from app.utils.hasher import Hasher
 from loguru import logger
 
 DEFAULT_ADMIN = {
