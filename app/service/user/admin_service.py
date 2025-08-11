@@ -1,7 +1,7 @@
 """service untuk seeding seeding admin dan lain lain."""
 
 from app.repos.rep_user import UserRepository
-from app.service.token.srv_token import TokenService  # import TokenService
+from app.service.token.srv_token import TokenService
 from app.utils.hasher import Hasher
 from loguru import logger
 

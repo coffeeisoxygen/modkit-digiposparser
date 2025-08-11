@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from app.dependencies import get_settings
 from app.exceptions.exceptions import InvalidTokenError, ServiceError
+from loguru import logger
 
 settings = get_settings()
 
@@ -13,23 +14,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 class TokenService:
-    """Token service for creating and decoding JWT tokens.
-
-    This service provides methods to create and decode JWT tokens for user authentication.
-
-    Raises:
-        ServiceError: If there is an error while creating or decoding the token.
-        InvalidTokenError: If the token is invalid or expired.
-
-    Returns:
-        str: The encoded JWT token.
-        dict: The decoded payload of the JWT token.
-    """
-
     @staticmethod
     def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
-        expire = datetime.utcnow() + (
+        expire = datetime.now(UTC) + (
             expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         to_encode.update({"exp": expire})
@@ -41,8 +29,10 @@ class TokenService:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         except jwt.ExpiredSignatureError:
+            logger.error("JWT token expired")
             raise ServiceError("Token expired") from None
-        except jwt.PyJWTError:
+        except jwt.PyJWTError as e:
+            logger.error(f"Invalid JWT token: {e}")
             raise InvalidTokenError("Invalid token") from None
         else:
             return payload
