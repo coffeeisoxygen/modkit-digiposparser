@@ -10,9 +10,8 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.rep_member import MemberRepository
-from app.feature.member.sch_member import MemberInDB,MemberTrxRequestModel
+from app.feature.member.sch_member import MemberInDB, MemberTrxRequestModel
 from app.feature.member.srv_member_auth import MemberAuthService
-
 from pydantic import AnyHttpUrl, SecretStr
 
 
@@ -137,7 +136,12 @@ class TestMemberAuthService:
     ):
         """Test successful authentication with valid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock the signature service method directly on the instance
+        # Mock both verify_signature and generate_transaction_signature
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            "verify_signature",
+            return_value=True,
+        )
         mocker.patch.object(
             member_auth_service.otomax_sign_service,
             "generate_transaction_signature",
@@ -158,7 +162,12 @@ class TestMemberAuthService:
     ):
         """Test authentication fails with invalid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock signature service to return different signature
+        # Mock signature service to return False for verification
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            "verify_signature",
+            return_value=False,
+        )
         mocker.patch.object(
             member_auth_service.otomax_sign_service,
             "generate_transaction_signature",
@@ -181,6 +190,8 @@ class TestMemberAuthService:
             dest="08123456567890",
             refid="REF001",
             pin="345678",  # Fix: sesuai dengan nosign_member fixture
+            password=None,
+            sign=None,
         )
 
         result = member_auth_service.authenticate_and_verify(request)
@@ -198,6 +209,8 @@ class TestMemberAuthService:
             dest="08123456567890",
             refid="REF001",
             password="test123",
+            pin=None,
+            sign=None,
         )
 
         result = member_auth_service.authenticate_and_verify(request)
@@ -215,6 +228,8 @@ class TestMemberAuthService:
             dest="08123456567890",
             refid="REF001",
             pin="wrong_pin",
+            password=None,
+            sign=None,
         )
 
         with pytest.raises(MemberInvalidCredentialsError) as exc_info:
@@ -233,6 +248,8 @@ class TestMemberAuthService:
             dest="08123456567890",
             refid="REF001",
             pin="123456",
+            password=None,
+            sign=None,
         )
 
         with pytest.raises(MemberInvalidSignatureError) as exc_info:

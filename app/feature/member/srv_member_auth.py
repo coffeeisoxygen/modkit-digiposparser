@@ -75,15 +75,22 @@ class MemberAuthService:
             password=member_db.password.get_secret_value(),
         )
 
-        if not self.otomax_sign_service.verify_signature(
+        logger.debug(f"Expected data: {expected_data}")
+        logger.debug(f"Received signature: {request.sign}")
+
+        verify_result = self.otomax_sign_service.verify_signature(
             expected_data, str(request.sign or "")
-        ):
+        )
+        logger.debug(f"Verify result: {verify_result}")
+
+        if not verify_result:
+            expected_sig = self.otomax_sign_service.generate_transaction_signature(
+                **expected_data
+            )
             logger.error(
                 "Signature tidak valid. Diterima={}, Diharapkan={}",
                 request.sign,
-                self.otomax_sign_service.generate_transaction_signature(
-                    **expected_data
-                ),
+                expected_sig,
             )
             raise MemberInvalidSignatureError("Signature tidak valid")
 
