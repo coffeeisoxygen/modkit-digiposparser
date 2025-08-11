@@ -76,11 +76,15 @@ async def main():
     json_resp = json_adapter.format_error(error)
     plain_resp = plaintext_adapter.format_error(error)
 
-    print(f"   JSON adapter response: {type(json_resp).__name__} - {json_resp.status_code}")
-    print(f"   Plaintext adapter response: {type(plain_resp).__name__} - {plain_resp.status_code}")
+    print(
+        f"   JSON adapter response: {type(json_resp).__name__} - {json_resp.status_code}"
+    )
+    print(
+        f"   Plaintext adapter response: {type(plain_resp).__name__} - {plain_resp.status_code}"
+    )
 
     # Test HTML method
-    print(f"\n6. HTML Fragment Generation:")
+    print("\n6. HTML Fragment Generation:")
     html_fragment = error.to_html()
     print(f"   HTML contains 'alert': {'alert' in html_fragment}")
     print(f"   HTML contains error message: {'Direct adapter test' in html_fragment}")

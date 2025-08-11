@@ -6,7 +6,7 @@ for HTMX admin interface error handling.
 
 from typing import Any
 
-from app.exceptions.canvas.exc_adapter import ResponseAdapter
+from app.exceptions.exc_adapter import ResponseAdapter
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 

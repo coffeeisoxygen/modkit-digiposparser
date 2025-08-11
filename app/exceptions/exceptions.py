@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi.responses import JSONResponse
 
 if TYPE_CHECKING:
-    from app.exceptions.canvas.exc_adapter import ResponseAdapter
+    from app.exceptions.exc_adapter import ResponseAdapter
 
 APP_NAME = "MODKIT-SERVICE"
 
@@ -129,3 +129,4 @@ class InvalidTokenError(AppExceptionError):
 
     default_message = "Invalid token."
     status_code = 401
+
