@@ -1,7 +1,7 @@
 """Tests for MemberAuthService using Repository pattern and conftest.py fixtures."""
 
 import pytest
-from app.exceptions.exc_member import (
+from app.exceptions import (
     MemberAuthError,
     MemberInvalidCredentialsError,
     MemberInvalidSignatureError,
