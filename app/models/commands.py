@@ -18,7 +18,7 @@ class ApiCommand(Base):
     command_template: Mapped[str] = mapped_column(String(1000), nullable=False)
     # contoh: "list_paket?username=[username]&to=[to]&trxid=[trxid]&category=[category]"
 
-    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     created_at: Mapped[DateTime] = mapped_column(
@@ -34,7 +34,3 @@ class ApiCommand(Base):
     # relasi opsional untuk kemudahan query
     product = relationship("Product", back_populates="api_commands")
     module = relationship("Module")
-
-
-# Jangan lupa di Product tambahin:
-# api_commands: Mapped[list["ApiCommand"]] = relationship("ApiCommand", back_populates="product")

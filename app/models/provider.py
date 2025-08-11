@@ -16,9 +16,9 @@ class Provider(Base):
     code: Mapped[str] = mapped_column(
         String(100), primary_key=True, nullable=False, unique=True
     )
-    description: Mapped[str] = mapped_column(String(200), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(200), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped = mapped_column(
+    created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     updated_at: Mapped[DateTime] = mapped_column(

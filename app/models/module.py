@@ -21,10 +21,10 @@ class Module(Base):
     max_retries: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
     second_wait: Mapped[int] = mapped_column(Integer, default=2, nullable=False)
     parameters: Mapped[JSON] = mapped_column(JSON, nullable=True)
-    optional_data: Mapped[JSON] = mapped_column(
+    optional_data: Mapped[JSON | None] = mapped_column(
         JSON, nullable=True
     )  # for credential that need to extend
-    description: Mapped[str] = mapped_column(
+    description: Mapped[str | None] = mapped_column(
         String(), nullable=True
     )  # just descriotions
     created_at: Mapped[DateTime] = mapped_column(

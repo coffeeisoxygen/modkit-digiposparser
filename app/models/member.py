@@ -11,7 +11,7 @@ class Member(Base):
     memberid: Mapped[str] = mapped_column(
         String(32), primary_key=True, nullable=False, unique=True
     )
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     pin: Mapped[str] = mapped_column(
         String(), nullable=False
     )  # Store as string, not SecretStr
@@ -23,7 +23,7 @@ class Member(Base):
     report_url: Mapped[str] = mapped_column(String(), nullable=False)
     allow_nosign: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    description: Mapped[str] = mapped_column(String(), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
