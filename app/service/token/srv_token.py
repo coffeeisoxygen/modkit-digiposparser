@@ -1,16 +1,33 @@
 from datetime import datetime, timedelta
 
 import jwt
-from app.exceptions.exceptions import ServiceError
+from app.dependencies import get_settings
+from app.exceptions.exceptions import InvalidTokenError, ServiceError
 
-SECRET_KEY = "ini_secret_key_super_rahasia"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+settings = get_settings()
+
+SECRET_KEY = settings.jwt.SECRET_KEY
+ALGORITHM = settings.jwt.ALGORITHM
+ACCESS_TOKEN_TYPE = settings.jwt.TOKEN_TYPE
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 class TokenService:
+    """Token service for creating and decoding JWT tokens.
+
+    This service provides methods to create and decode JWT tokens for user authentication.
+
+    Raises:
+        ServiceError: If there is an error while creating or decoding the token.
+        InvalidTokenError: If the token is invalid or expired.
+
+    Returns:
+        str: The encoded JWT token.
+        dict: The decoded payload of the JWT token.
+    """
+
     @staticmethod
-    def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
         expire = datetime.utcnow() + (
             expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -20,12 +37,12 @@ class TokenService:
         return encoded_jwt
 
     @staticmethod
-    def verify_token(token: str):
+    def decode_token(token: str) -> dict:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            username: str = payload.get("sub")
-            if username is None:
-                raise ServiceError("Invalid token payload")
-            return username
+        except jwt.ExpiredSignatureError:
+            raise ServiceError("Token expired") from None
         except jwt.PyJWTError:
-            raise ServiceError("Token verification failed")
+            raise InvalidTokenError("Invalid token") from None
+        else:
+            return payload

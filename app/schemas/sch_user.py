@@ -1,4 +1,4 @@
-from app.schemas.sch_user_validation import (
+from app.schemas.sch_validators import (
     NameUserIsAlpha,
     PasswordIsStrong,
     UserNameIsAlNum,
