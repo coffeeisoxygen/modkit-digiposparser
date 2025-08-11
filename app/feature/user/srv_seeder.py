@@ -7,7 +7,7 @@ from loguru import logger
 DEFAULT_ADMIN = {
     "username": "admin",
     "name": "Administrator",
-    "password": Hasher.hash_password("Admin123@"),
+    "hashed_password": Hasher.hash_password("Admin123@"),  # <-- changed field name
     "is_superuser": True,
     "is_active": True,
 }

@@ -23,7 +23,6 @@ class DatabaseSessionManager:
             self.engine,
             expire_on_commit=False,
             class_=AsyncSession,
-            echo=settings.database_echo,
         )
 
     async def close(self):

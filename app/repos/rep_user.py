@@ -26,8 +26,9 @@ class UserRepository:
         )
         return result.scalar_one_or_none()
 
-    async def create_user(self, user: User) -> User:
-        """Create a new user."""
+    async def create_user(self, **user_data) -> User:
+        """Create a new user from keyword arguments."""
+        user = User(**user_data)
         self.session.add(user)
         await self.session.commit()
         await self.session.refresh(user)

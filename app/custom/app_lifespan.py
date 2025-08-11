@@ -1,19 +1,24 @@
-"""Setup LifeSpan before the application starts."""
-
 from contextlib import asynccontextmanager
 
-from app.database.table import sessionmanager
+from app.database.session import sessionmanager
 from app.feature.user import AdminSeeding
+from app.repos.rep_user import UserRepository
 from fastapi import FastAPI
+from loguru import logger
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for FastAPI application."""
-    admin_seeding = AdminSeeding(app.state.user_repo)
-    await admin_seeding.seed_admin()
+    logger.info("Starting application...")
 
-    yield  # Application runs here
+    # Seed admin sebelum aplikasi jalan
+    async with sessionmanager.session() as session:
+        repo = UserRepository(session)
+        seeder = AdminSeeding(repo)
+        await seeder.seed_admin()
+
+    yield  # aplikasi jalan disini
 
     if sessionmanager.engine is not None:
         await sessionmanager.close()
