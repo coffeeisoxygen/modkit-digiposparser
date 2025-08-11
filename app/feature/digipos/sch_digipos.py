@@ -1,7 +1,11 @@
-"""containing all schmeas related to digipos.
+"""containing all schemas related to digipos.
 
-Later akan di improve.
-plant endpoint (below are example Only):
+Architecture:
+- Base authentication: MemberTrxRequestModel dari sch_member.py
+- Domain composition: DigiposTrxRequestBase extends base + digipos-specific validation
+- Action-specific models: List/Check/Buy dengan field tambahan sesuai kebutuhan
+
+Planned endpoints:
 1-digipos/trx?action=list&product=DATA&up_harga=<up_harga>&minday=<minday>&maxday=<maxday>
 2-digipos/trx?action=check&product=DATA&product_id=<product_id>&up_harga=<up_harga>
 3-digipos/trx?action=buy&product=DATA&product_id=<product_id>&up_harga=<up_harga>
@@ -10,7 +14,7 @@ plant endpoint (below are example Only):
 from enum import StrEnum
 from typing import Annotated
 
-from app.feature.transaction.sch_trx_request import ReqClientBase
+from app.feature.member.sch_member import MemberTrxRequestModel
 from pydantic import BeforeValidator, Field, field_validator, model_validator
 
 
@@ -47,16 +51,17 @@ class DigiposCatAsProdEnum(StrEnum):
     HVC_VOICE_SMS = "HVC_VOICE_SMS"
 
 
-class DigiposTrxRequestBase(ReqClientBase):
+class DigiposTrxRequestBase(MemberTrxRequestModel):
     """Request model untuk endpoint transaksi Digipos.
 
-    Inherit dari ReqClientBase untuk konsistensi authentication dan payload.
+    Inherit dari MemberTrxRequestModel untuk authentication dan base payload.
+    Override product validation untuk domain digipos dan tambah field spesifik.
 
     Additional fields:
         action: DigposActionEnum - action to be performed
         markup: int | None - markup dapat berupa decimal atau integer
 
-    Inherited fields dari ReqClientBase:
+    Inherited fields dari MemberTrxRequestModel:
         memberid, product, dest, refid, sign, pin, password
     """
 
@@ -79,6 +84,8 @@ class DigiposTrxRequestBase(ReqClientBase):
 
 
 class DigiposRequestList(DigiposTrxRequestBase):
+    """Request model untuk list paket dengan filter opsional."""
+
     action: DigposActionEnum = DigposActionEnum.LIST
 
     # future features - all optional with default None
@@ -107,10 +114,14 @@ class DigiposRequestList(DigiposTrxRequestBase):
 
 
 class DigiposRequestCheck(DigiposTrxRequestBase):
+    """Request model untuk check produk spesifik."""
+
     action: DigposActionEnum = DigposActionEnum.CHECK
     productid: str = Field(description="Product ID to check")
 
 
 class DigiposRequestBuy(DigiposTrxRequestBase):
+    """Request model untuk buy produk spesifik."""
+
     action: DigposActionEnum = DigposActionEnum.BUY
     productid: str = Field(description="Product ID to buy")
