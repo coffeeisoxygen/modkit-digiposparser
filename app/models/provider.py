@@ -9,14 +9,7 @@ if TYPE_CHECKING:
 
 
 class Provider(Base):
-    """Represents a provider in the system.
-
-    This model is used to store information about product providers.
-    has one to many relationship to product :
-    one provider can have many products not vice versa
-    """
-
-    __tablename__ = "provider"
+    __tablename__ = "providers"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
@@ -30,4 +23,8 @@ class Provider(Base):
         server_default=func.now(),
         nullable=False,
     )
-    products: Mapped[list["Product"]] = relationship()
+    products: Mapped[list["Product"]] = relationship(
+        "Product",  # <-- harus "Product" bukan "Products"
+        back_populates="provider",
+        cascade="all, delete-orphan",
+    )

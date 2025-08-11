@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Member(Base):
-    __tablename__ = "member"
+    __tablename__ = "members"
 
     memberid: Mapped[str] = mapped_column(
         String(32), primary_key=True, nullable=False, unique=True
