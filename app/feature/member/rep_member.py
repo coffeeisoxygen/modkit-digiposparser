@@ -66,6 +66,20 @@ class MemberRepository:
                 "MemberRepository reload completed successfully", count=len(new_members)
             )
 
+        except FileNotFoundError as e:
+            # Only fallback if we already have data loaded, else propagate
+            if not self._members:
+                logger.error(
+                    "Member data file not found during initial load",
+                    error=str(e),
+                    path=str(self.file_path),
+                )
+                raise
+            logger.error(
+                "Failed to reload member data, keeping existing data",
+                error=str(e),
+                current_count=len(self._members),
+            )
         except Exception as e:
             # Fallback behavior - keep existing data on reload failure
             logger.error(

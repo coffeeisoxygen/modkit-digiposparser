@@ -3,7 +3,6 @@
 import time
 
 import pytest
-
 from app.feature.member.sch_member import MemberInDB
 from app.feature.member.srv_memberdata import (
     check_duplicate_memberids,
@@ -193,19 +192,19 @@ members:
             load_and_validate_yaml(yaml_file)
         assert "Member validation failed" in str(exc_info.value)
 
-    def test_valid_yaml_should_return_members(self, tmp_path, sample_member_db_data):
+    def test_valid_yaml_should_return_members(self, tmp_path, valid_member_db):
         """Test successful loading of valid YAML."""
         # Arrange
         yaml_content = f"""
 members:
-  - memberid: {sample_member_db_data[0]["memberid"]}
-    name: {sample_member_db_data[0]["name"]}
-    pin: "{sample_member_db_data[0]["pin"]}"
-    password: {sample_member_db_data[0]["password"]}
-    is_active: {sample_member_db_data[0]["is_active"]}
-    ipaddress: {sample_member_db_data[0]["ipaddress"]}
-    report_url: {sample_member_db_data[0]["report_url"]}
-    allow_nosign: {sample_member_db_data[0]["allow_nosign"]}
+  - memberid: {valid_member_db["memberid"]}
+    name: {valid_member_db["name"]}
+    pin: "{valid_member_db["pin"]}"
+    password: {valid_member_db["password"]}
+    is_active: {valid_member_db["is_active"]}
+    ipaddress: {valid_member_db["ipaddress"]}
+    report_url: {valid_member_db["report_url"]}
+    allow_nosign: {valid_member_db["allow_nosign"]}
 """
         yaml_file = tmp_path / "valid.yaml"
         yaml_file.write_text(yaml_content, encoding="utf-8")
@@ -216,8 +215,8 @@ members:
         # Assert
         assert len(members) == 1
         assert isinstance(members[0], MemberInDB)
-        assert members[0].memberid == sample_member_db_data[0]["memberid"]
-        assert members[0].name == sample_member_db_data[0]["name"]
+        assert members[0].memberid == valid_member_db["memberid"]
+        assert members[0].name == valid_member_db["name"]
 
     def test_empty_members_list_should_return_empty_list(self, tmp_path):
         """Test with empty members list."""
@@ -288,15 +287,10 @@ class TestSrvMemberdataIntegration:
         assert all(isinstance(m, MemberInDB) for m in members)
         assert all(len(m.memberid) >= 5 for m in members)  # Min length validation
 
-    @pytest.mark.parametrize(
-        "member_data",
-        [pytest.param(None, marks=pytest.mark.indirect)],
-        indirect=["member_data"],
-    )
-    def test_validate_conftest_member_data(self, sample_member_db_data):
+    def test_validate_conftest_member_data(self, valid_member_db):
         """Test that conftest.py member data is valid."""
         # Act & Assert - should not raise any exception
-        member = MemberInDB(**sample_member_db_data)
+        member = MemberInDB(**valid_member_db)
         assert member.memberid is not None
         assert len(member.memberid) >= 5
 
