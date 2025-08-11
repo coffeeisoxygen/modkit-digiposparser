@@ -10,8 +10,9 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.rep_member import MemberRepository
-from app.feature.member.sch_member import MemberInDB, MemberTrxRequestModel
+from app.feature.member.sch_member import MemberInDB
 from app.feature.member.srv_member_auth import MemberAuthService
+from app.feature.transaction.sch_request import ReqClientBase
 from pydantic import AnyHttpUrl, SecretStr
 
 
@@ -88,10 +89,10 @@ def nosign_member():
 @pytest.fixture
 def valid_request():
     """Valid request for testing."""
-    return MemberTrxRequestModel(
+    return ReqClientBase(
         memberid="TEST001",
-        dest="08123456789",
         product="DATA",
+        dest="08123456567890",
         refid="REF001",
         pin="123456",
         password="test123",
@@ -136,10 +137,12 @@ class TestMemberAuthService:
     ):
         """Test successful authentication with valid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock OtomaxSignatureService class since it's instantiated in static method
-        mocker.patch(
-            "app.feature.srv_signature.OtomaxSignatureService"
-        ).return_value.generate_transaction_signature.return_value = "valid_signature"
+        # Mock the signature service method directly on the instance
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            "generate_transaction_signature",
+            return_value="valid_signature",
+        )
 
         result = member_auth_service.authenticate_and_verify(valid_request)
 
@@ -155,11 +158,11 @@ class TestMemberAuthService:
     ):
         """Test authentication fails with invalid signature."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        # Mock OtomaxSignatureService class to return different signature
-        mocker.patch(
-            "app.feature.srv_signature.OtomaxSignatureService"
-        ).return_value.generate_transaction_signature.return_value = (
-            "different_signature"
+        # Mock signature service to return different signature
+        mocker.patch.object(
+            member_auth_service.otomax_sign_service,
+            "generate_transaction_signature",
+            return_value="different_signature",
         )
 
         with pytest.raises(MemberInvalidSignatureError) as exc_info:
@@ -172,14 +175,12 @@ class TestMemberAuthService:
     ):
         """Test successful authentication without signature using PIN."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="TEST003",
-            dest="08123456789",
             product="DATA",
+            dest="08123456567890",
             refid="REF001",
             pin="345678",  # Fix: sesuai dengan nosign_member fixture
-            password=None,
-            sign=None,
         )
 
         result = member_auth_service.authenticate_and_verify(request)
@@ -191,12 +192,11 @@ class TestMemberAuthService:
     ):
         """Test successful authentication without signature using password."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="TEST003",
             product="DATA",
-            dest="08123456789",  # <-- Add dest
+            dest="08123456567890",
             refid="REF001",
-            pin=None,
             password="test123",
         )
 
@@ -209,7 +209,7 @@ class TestMemberAuthService:
     ):
         """Test authentication fails with invalid PIN/password for nosign member."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="TEST003",
             product="DATA",
             dest="08123456567890",
@@ -227,7 +227,7 @@ class TestMemberAuthService:
     ):
         """Test authentication fails when signature required but not provided."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="TEST001",
             product="DATA",
             dest="08123456567890",
@@ -256,7 +256,7 @@ class TestMemberAuthServiceWithRealRepo:
             return_value="valid_signature",
         )
 
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="otomax1",
             product="DATA",
             dest="08123456567890",
@@ -272,7 +272,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax2_inactive_member(self, real_member_auth_service):
         """Test authentication fails for inactive otomax2."""
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="otomax2",
             product="DATA",
             dest="08123456567890",
@@ -287,7 +287,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax3_nosign_with_pin(self, real_member_auth_service):
         """Test otomax3 authentication with PIN (active, allow_nosign=True)."""
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="otomax3",
             product="DATA",
             dest="08123456567890",
@@ -303,7 +303,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax3_nosign_with_password(self, real_member_auth_service):
         """Test otomax3 authentication with password."""
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="otomax3",
             product="DATA",
             dest="08123456567890",
@@ -317,7 +317,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax1_requires_signature(self, real_member_auth_service):
         """Test otomax1 requires signature (allow_nosign=False)."""
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="otomax1",
             product="DATA",
             dest="08123456567890",
@@ -332,7 +332,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_member_not_found_in_real_data(self, real_member_auth_service):
         """Test member not found with real data source."""
-        request = MemberTrxRequestModel(
+        request = ReqClientBase(
             memberid="nonexistent",
             product="DATA",
             dest="08123456567890",

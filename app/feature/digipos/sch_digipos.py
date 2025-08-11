@@ -54,7 +54,7 @@ class DigiposTrxRequestBase(ReqClientBase):
 
     Additional fields:
         action: DigposActionEnum - action to be performed
-        markup: int | None - markup dapat berupa decimal atau integer (maps to up_harga)
+        markup: int | None - markup dapat berupa decimal atau integer
 
     Inherited fields dari ReqClientBase:
         memberid, product, dest, refid, sign, pin, password
@@ -64,9 +64,7 @@ class DigiposTrxRequestBase(ReqClientBase):
         description="Action to be performed", examples=["list", "check", "buy"]
     )
     markup: int | None = Field(
-        default=0,
-        alias="up_harga",
-        description="Markup can be decimal or integer, maps to up_harga in API",
+        default=0, description="Markup can be decimal or integer"
     )
 
     @field_validator("product")
@@ -83,17 +81,7 @@ class DigiposTrxRequestBase(ReqClientBase):
 class DigiposRequestList(DigiposTrxRequestBase):
     action: DigposActionEnum = DigposActionEnum.LIST
 
-    # Optional API fields yang akan diteruskan ke Digipos API
-    product_sub_category: str | None = Field(
-        default=None,
-        alias="productSubCategory",
-        description="Sub category filter for products",
-    )
-    duration: str | None = Field(
-        default=None, description="Duration filter for products"
-    )
-
-    # Internal pre-processing fields (tidak diteruskan ke API)
+    # future features - all optional with default None
     minday: NonNegativeInt = None
     maxday: NonNegativeInt = None
     minprice: NonNegativeInt = None
