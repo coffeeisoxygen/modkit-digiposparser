@@ -1,6 +1,6 @@
 from typing import Protocol, runtime_checkable
 
-from app.exceptions.exc_member import (
+from app.exceptions.custom.exc_member import (
     MemberAuthError,
     MemberInvalidCredentialsError,
     MemberInvalidSignatureError,

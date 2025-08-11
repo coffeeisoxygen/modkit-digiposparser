@@ -8,12 +8,12 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-from app.exceptions.exc_base import BaseExcpError
-from app.response.response_adapter import (
+from app.exceptions.canvas.exc_adapter import (
     JsonResponseAdapter,
     PlaintextResponseAdapter,
     ResponseAdapter,
 )
+from app.exceptions.canvas.exc_base import AppExceptionError
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 
@@ -23,7 +23,7 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
 
     This decorator wraps FastAPI endpoints and automatically handles:
     - Success responses (formatted via adapter)
-    - Custom application exceptions (BaseExcpError)
+    - Custom application exceptions (AppExceptionError)
     - Pydantic validation errors (from request models)
     - Generic Python exceptions
 
@@ -92,7 +92,7 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
 
                 return adapter.format_error(validation_error)
 
-            except BaseExcpError as e:
+            except AppExceptionError as e:
                 # Handle our custom application exceptions
                 return adapter.format_error(e)
 

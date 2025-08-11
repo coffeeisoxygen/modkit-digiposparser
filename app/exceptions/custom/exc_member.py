@@ -4,7 +4,7 @@ Provides specialized exceptions for member authentication, validation,
 and access scenarios.
 """
 
-from app.exceptions.exc_base import BaseExcpError
+from app.exceptions.custom.exc_base import BaseExcpError
 
 
 class MemberAuthError(BaseExcpError):

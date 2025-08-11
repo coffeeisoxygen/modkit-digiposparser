@@ -1,9 +1,9 @@
-from app.response.response_adapter import (
+from app.exceptions.canvas.exc_adapter import (
     JsonResponseAdapter,
     PlaintextResponseAdapter,
     ResponseAdapter,
 )
-from app.response.response_handler import (
+from app.exceptions.canvas.exc_handler import (
     with_json_response,
     with_plaintext_response,
     with_response_adapter,
