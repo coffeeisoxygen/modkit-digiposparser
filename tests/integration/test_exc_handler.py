@@ -5,12 +5,11 @@ and FastAPI integration scenarios.
 """
 
 import pytest
-from app.exceptions.canvas.exc_adapter import (
+from app.exceptions import (
+    AppExceptionError,
     JsonResponseAdapter,
     PlaintextResponseAdapter,
-)
-from app.exceptions.canvas.exc_base import AppExceptionError, ServiceError
-from app.exceptions.canvas.exc_handler import (
+    ServiceError,
     with_json_response,
     with_plaintext_response,
     with_response_adapter,
@@ -100,7 +99,7 @@ class TestWithResponseAdapterDecorator:
                 name: str
                 age: int
 
-            TestModel(name="test")  # Missing required field
+            TestModel(name="test")  # type: ignore # Missing required field
         except ValidationError as e:
             validation_error = e
 

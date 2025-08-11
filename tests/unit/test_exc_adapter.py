@@ -5,12 +5,13 @@ and error handling functionality.
 """
 
 import pytest
-from app.exceptions.canvas.exc_adapter import (
+from app.exceptions import (
+    AppExceptionError,
     JsonResponseAdapter,
     PlaintextResponseAdapter,
     ResponseAdapter,
+    ServiceError,
 )
-from app.exceptions.canvas.exc_base import AppExceptionError, ServiceError
 from fastapi.responses import JSONResponse, PlainTextResponse
 
 
@@ -21,7 +22,7 @@ class TestResponseAdapterAbstract:
     def test_cannot_instantiate_abstract_class(self):
         # Arrange, Act & Assert
         with pytest.raises(TypeError) as exc_info:
-            ResponseAdapter()
+            ResponseAdapter()  # type: ignore
 
         assert "Can't instantiate abstract class" in str(exc_info.value)
 

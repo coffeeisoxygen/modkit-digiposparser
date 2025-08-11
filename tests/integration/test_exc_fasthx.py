@@ -5,8 +5,8 @@ HTML response functionality.
 """
 
 import pytest
-from app.exceptions.canvas.exc_base import AppExceptionError, ServiceError
-from app.exceptions.canvas.exc_fasthx import (
+from app.exceptions import AppExceptionError, ServiceError
+from app.exceptions.exc_fasthx import (
     with_config_error_handling,
     with_htmx_error_handling,
 )

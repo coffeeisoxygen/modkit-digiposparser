@@ -5,7 +5,7 @@ and response formatting methods.
 """
 
 import pytest
-from app.exceptions.canvas.exc_base import (
+from app.exceptions import (
     APP_NAME,
     AppExceptionError,
     AuthenticationFailedError,
