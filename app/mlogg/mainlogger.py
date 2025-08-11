@@ -296,6 +296,11 @@ def setup_loguru(
     configure_uvicorn_logging()
     sys.stdout = StreamToLogger("INFO")
     sys.stderr = StreamToLogger("ERROR")
+    # set elvel for common library\
+    logging.getLogger("aiosqlite").setLevel(logging.WARNING)
+    logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+    logging.getLogger("uvicorn.error").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
 # redirecting setup

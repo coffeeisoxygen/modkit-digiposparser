@@ -70,14 +70,20 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         method_ctx.set(method)
 
     def _log_response(
-        self,
-        response: Response,
-        start_time: float,
-        logger_instance,  # noqa: ANN001
+        self, response: Response, start_time: float, logger_instance
     ) -> None:
         execution_time = time.time() - start_time
-        logger_instance.debug(
-            f"Response: {response.status_code} | Duration: {execution_time:.4f}s"
+        status = response.status_code
+
+        if status >= 500:
+            log_level = "error"
+        elif status >= 400:
+            log_level = "warning"
+        else:
+            log_level = "info"
+
+        logger_instance.log(
+            log_level, f"Response: {status} | Duration: {execution_time:.4f}s"
         )
 
     def _log_exception(
