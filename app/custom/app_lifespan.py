@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from app.database.session import sessionmanager
 from app.repos.rep_user import UserRepository
-from app.service.user import AdminSeeding
+from app.service.user.admin_service import AdminService
 from fastapi import FastAPI
 from loguru import logger
 
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     # Seed admin sebelum aplikasi jalan
     async with sessionmanager.session() as session:
         repo = UserRepository(session)
-        seeder = AdminSeeding(repo)
+        seeder = AdminService(repo)
         await seeder.seed_admin()
 
     yield  # aplikasi jalan disini
