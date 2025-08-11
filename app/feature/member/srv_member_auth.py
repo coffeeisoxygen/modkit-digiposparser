@@ -42,7 +42,7 @@ class MemberAuthService:
         """Ambil member dari DB + cek aktif."""
         member = self.member_manager.get_member_by_id(memberid)
         if not member:
-            raise MemberNotFoundError(f"Member ID '{memberid}' tidak ditemukan")
+            raise MemberNotFoundError(f"Member ID '{memberid}' not found")
         if not member.is_active:
             raise MemberAuthError("Member tidak aktif")
         return member
@@ -64,21 +64,9 @@ class MemberAuthService:
         else:
             raise MemberInvalidCredentialsError("PIN atau Password tidak valid")
 
-    @staticmethod
-    def _generate_expected_signature(request: MemberTrxRequestModel) -> str:
-        """Generate signature berdasarkan request."""
-        return OtomaxSignatureService().generate_transaction_signature(
-            memberid=request.memberid,
-            product=str(request.product or ""),
-            dest=str(request.dest or ""),  # <-- FIXED: use request.dest
-            refid=str(request.refid or ""),
-            pin=str(request.pin or ""),
-            password=str(request.password or ""),
-        )
-
     def _verify_signature(self, request: MemberTrxRequestModel, member_db: MemberInDB):
-        """Verifikasi signature yang dikirim client."""
-        expected_signature = self.otomax_sign_service.generate_transaction_signature(
+        """Verifikasi signature yang dikirim client (OtomaX format)."""
+        expected_data = dict(
             memberid=request.memberid,
             product=str(request.product or ""),
             dest=str(request.dest or ""),
@@ -86,11 +74,17 @@ class MemberAuthService:
             pin=member_db.pin.get_secret_value(),
             password=member_db.password.get_secret_value(),
         )
-        if str(request.sign) != str(expected_signature):
+
+        if not self.otomax_sign_service.verify_signature(
+            expected_data, str(request.sign or "")
+        ):
             logger.error(
                 "Signature tidak valid. Diterima={}, Diharapkan={}",
                 request.sign,
-                expected_signature,
+                self.otomax_sign_service.generate_transaction_signature(
+                    **expected_data
+                ),
             )
             raise MemberInvalidSignatureError("Signature tidak valid")
+
         logger.info("Signature valid")

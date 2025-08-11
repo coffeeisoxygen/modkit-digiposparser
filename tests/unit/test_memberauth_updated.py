@@ -10,9 +10,9 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.rep_member import MemberRepository
-from app.feature.member.sch_member import MemberInDB
+from app.feature.member.sch_member import MemberInDB,MemberTrxRequestModel
 from app.feature.member.srv_member_auth import MemberAuthService
-from app.feature.transaction.sch_request import ReqClientBase
+
 from pydantic import AnyHttpUrl, SecretStr
 
 
@@ -89,7 +89,7 @@ def nosign_member():
 @pytest.fixture
 def valid_request():
     """Valid request for testing."""
-    return ReqClientBase(
+    return MemberTrxRequestModel(
         memberid="TEST001",
         product="DATA",
         dest="08123456567890",
@@ -175,7 +175,7 @@ class TestMemberAuthService:
     ):
         """Test successful authentication without signature using PIN."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="TEST003",
             product="DATA",
             dest="08123456567890",
@@ -192,7 +192,7 @@ class TestMemberAuthService:
     ):
         """Test successful authentication without signature using password."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="TEST003",
             product="DATA",
             dest="08123456567890",
@@ -209,7 +209,7 @@ class TestMemberAuthService:
     ):
         """Test authentication fails with invalid PIN/password for nosign member."""
         mock_member_repo.get_member_by_id.return_value = nosign_member
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="TEST003",
             product="DATA",
             dest="08123456567890",
@@ -227,7 +227,7 @@ class TestMemberAuthService:
     ):
         """Test authentication fails when signature required but not provided."""
         mock_member_repo.get_member_by_id.return_value = active_member
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="TEST001",
             product="DATA",
             dest="08123456567890",
@@ -256,7 +256,7 @@ class TestMemberAuthServiceWithRealRepo:
             return_value="valid_signature",
         )
 
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="otomax1",
             product="DATA",
             dest="08123456567890",
@@ -272,7 +272,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax2_inactive_member(self, real_member_auth_service):
         """Test authentication fails for inactive otomax2."""
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="otomax2",
             product="DATA",
             dest="08123456567890",
@@ -287,7 +287,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax3_nosign_with_pin(self, real_member_auth_service):
         """Test otomax3 authentication with PIN (active, allow_nosign=True)."""
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="otomax3",
             product="DATA",
             dest="08123456567890",
@@ -303,7 +303,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax3_nosign_with_password(self, real_member_auth_service):
         """Test otomax3 authentication with password."""
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="otomax3",
             product="DATA",
             dest="08123456567890",
@@ -317,7 +317,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_authenticate_otomax1_requires_signature(self, real_member_auth_service):
         """Test otomax1 requires signature (allow_nosign=False)."""
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="otomax1",
             product="DATA",
             dest="08123456567890",
@@ -332,7 +332,7 @@ class TestMemberAuthServiceWithRealRepo:
 
     def test_member_not_found_in_real_data(self, real_member_auth_service):
         """Test member not found with real data source."""
-        request = ReqClientBase(
+        request = MemberTrxRequestModel(
             memberid="nonexistent",
             product="DATA",
             dest="08123456567890",

@@ -1,5 +1,5 @@
 import pytest
-from app.feature.srv_signature import OtomaxSignatureService
+from app.feature.member.srv_signature import OtomaxSignatureService
 
 
 @pytest.mark.unit
@@ -116,7 +116,7 @@ def test_otomax_signature_should_match_actual_generated_sign():
     pin = "777999"
     password = "vps777999"
     product = "CLPDATA"
-    qty = "1"
+    qty = "1"  # noqa: F841
     dest = "081295221639"
     refid = "3041094LIST"
     # Act
