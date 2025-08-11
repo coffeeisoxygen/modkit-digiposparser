@@ -7,7 +7,7 @@ from app.exceptions.exc_member import (
     MemberNotFoundError,
 )
 from app.feature.member.sch_member import MemberInDB, MemberTrxRequestModel
-from app.feature.srv_signature import OtomaxSignatureService
+from app.feature.member.srv_signature import OtomaxSignatureService
 from loguru import logger
 
 
