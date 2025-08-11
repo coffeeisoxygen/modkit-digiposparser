@@ -20,12 +20,15 @@ class DatabaseSessionManager:
     def __init__(self, host: str):
         self.engine: AsyncEngine | None = create_async_engine(host)
         self._sessionmaker: async_sessionmaker[AsyncSession] = async_sessionmaker(
-            autocommit=False, bind=self.engine, echo=settings.database_echo
+            self.engine,
+            expire_on_commit=False,
+            class_=AsyncSession,
+            echo=settings.database_echo,
         )
 
     async def close(self):
         if self.engine is None:
-            raise ServiceError
+            raise ServiceError("Engine is already disposed")
         await self.engine.dispose()
         self.engine = None
         self._sessionmaker = None  # type: ignore
@@ -33,43 +36,33 @@ class DatabaseSessionManager:
     @contextlib.asynccontextmanager
     async def connect(self) -> AsyncIterator[AsyncConnection]:
         if self.engine is None:
-            raise ServiceError
-
-        async with self.engine.begin() as connection:
+            raise ServiceError("Engine not initialized")
+        async with self.engine.connect() as connection:
             try:
                 yield connection
             except SQLAlchemyError as e:
-                await connection.rollback()
-                logger.error("Connection error occurred")
+                logger.error(f"Connection error occurred: {e}")
                 raise ServiceError from e
 
     @contextlib.asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncSession]:
         if not self._sessionmaker:
             logger.error("Sessionmaker is not available")
-            raise ServiceError
+            raise ServiceError("Sessionmaker is not available")
 
-        session = self._sessionmaker()
-        try:
-            yield session
-        except SQLAlchemyError as e:
-            await session.rollback()
-            logger.error(f"Session error could not be established {e}")
-            raise ServiceError("Could not establish session") from e
-        finally:
-            await session.close()
+        async with self._sessionmaker() as session:
+            try:
+                yield session
+            except SQLAlchemyError as e:
+                await session.rollback()
+                logger.error(f"Session error occurred: {e}")
+                raise ServiceError("Could not establish session") from e
 
 
 sessionmanager = DatabaseSessionManager(settings.database_url)
 
 
 async def get_db_session():
-    """Get a database session.
-
-    This function provides a database session for the duration of the request.
-
-    Yields:
-        _type_: Database session
-    """
+    """FastAPI dependency to get DB session."""
     async with sessionmanager.session() as session:
         yield session
