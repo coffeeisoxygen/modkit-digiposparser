@@ -2,7 +2,7 @@ from app.dependencies.dep_admin import get_admin_service, get_token_service
 from app.exceptions.exceptions import AuthenticationFailedError, InvalidTokenError
 from app.schemas.sch_token import AdminLoginRequest, Token
 from app.service.token.srv_token import TokenService
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter(prefix="/adm", tags=["Admin"])
@@ -12,7 +12,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/adm/login")
 
 @router.post("/login", response_model=Token)
 async def login_admin(
-    form_data: AdminLoginRequest,
+    form_data: AdminLoginRequest = Body(...),
     admin_service=Depends(get_admin_service),  # noqa: ANN001
 ) -> dict:
     """Handle admin login and return JWT token.

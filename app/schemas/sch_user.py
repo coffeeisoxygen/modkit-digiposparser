@@ -47,7 +47,7 @@ class UserLogin(UserConfig):
     """
 
     username: UserNameIsAlNum = Field(..., max_length=64)
-    hashed_password: PasswordIsStrong = Field(..., min_length=1)
+    password: PasswordIsStrong = Field(..., min_length=1)
 
 
 class PasswordChange(UserConfig):
