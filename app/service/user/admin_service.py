@@ -16,11 +16,10 @@ DEFAULT_ADMIN = {
 }
 
 
-
 class AdminService:
     """Service untuk operasi admin: seeding dan login."""
 
-    def __init__(self, repo: UserRepository, token_service: TokenService = None):
+    def __init__(self, repo: UserRepository, token_service: TokenService | None = None):
         self.repo = repo
         self.token_service = token_service
 
