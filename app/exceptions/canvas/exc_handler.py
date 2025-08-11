@@ -8,13 +8,14 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-from app.exceptions.exc_adapter import (
+from app.exceptions.futurecode.exc_adapter import (
     JsonResponseAdapter,
     PlaintextResponseAdapter,
     ResponseAdapter,
 )
-from app.exceptions.exc_base import AppExceptionError
+from app.exceptions.exceptions import AppExceptionError
 from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
 
 def with_response_adapter(adapter_class: type[ResponseAdapter]):
@@ -60,21 +61,18 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
                 error_msg = "; ".join(error_details)
 
                 # Create a mock exception with required methods
-                class ValidationError(Exception):
-                    def __init__(self, msg: str, original_error: Exception):
-                        self.message = msg
-                        self.original_error = original_error
-                        self.status_code = 422
-                        super().__init__(msg)
+                validation_error = type(
+                    "ValidationError",
+                    (Exception,),
+                    {
+                        "to_plaintext": lambda: f"Validation Error: {error_msg}",
+                        "to_response": lambda: adapter.format_error(e),  # noqa: F821
+                        "status_code": 422,
+                        "__str__": lambda: error_msg,
+                    },
+                )()
 
-                    def to_plaintext(self) -> str:
-                        return f"Validation Error: {self.message}"
-
-                    def __str__(self) -> str:
-                        return self.message
-
-                validation_error = ValidationError(error_msg, e)
-                return adapter.format_error(validation_error)
+                return adapter.format_error(validation_error)  # type: ignore
 
             except ValidationError as e:
                 # Handle direct Pydantic validation errors
@@ -82,41 +80,34 @@ def with_response_adapter(adapter_class: type[ResponseAdapter]):
                     f"{err['loc'][-1]}: {err['msg']}" for err in e.errors()
                 ])
 
-                class PydanticValidationErrorWrapper(Exception):
-                    def __init__(self, msg: str):
-                        self.message = msg
-                        self.status_code = 422
-                        super().__init__(msg)
+                validation_error = type(
+                    "ValidationError",
+                    (Exception,),
+                    {
+                        "to_plaintext": lambda: f"Validation Error: {error_msg}",
+                        "status_code": 422,
+                        "__str__": lambda: error_msg,
+                    },
+                )()
 
-                    def to_plaintext(self) -> str:
-                        return f"Validation Error: {self.message}"
-
-                    def __str__(self) -> str:
-                        return self.message
-
-                validation_error = PydanticValidationErrorWrapper(error_msg)
                 return adapter.format_error(validation_error)
 
             except AppExceptionError as e:
                 # Handle our custom application exceptions
                 return adapter.format_error(e)
 
-            except Exception as generic_exception:
+            except Exception:
                 # Handle any other unexpected exceptions
-                class GenericExceptionError(Exception):
-                    def __init__(self, original_error: Exception):
-                        self.original_error = original_error
-                        self.status_code = 500
-                        self.message = str(original_error)
-                        super().__init__(self.message)
+                generic_error = type(
+                    "GenericError",
+                    (Exception,),
+                    {
+                        "to_plaintext": lambda: f"Internal Error: {e!s}",  # noqa: F821 # type: ignore
+                        "status_code": 500,
+                        "__str__": lambda: str(e),  # noqa: F821 # type: ignore
+                    },
+                )()
 
-                    def to_plaintext(self) -> str:
-                        return f"Internal Error: {self.message}"
-
-                    def __str__(self) -> str:
-                        return self.message
-
-                generic_error = GenericExceptionError(generic_exception)
                 return adapter.format_error(generic_error)
 
         return wrapper
