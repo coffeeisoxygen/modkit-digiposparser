@@ -76,11 +76,11 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         status = response.status_code
 
         if status >= 500:
-            log_level = "error"
+            log_level = "ERROR"
         elif status >= 400:
-            log_level = "warning"
+            log_level = "WARNING"
         else:
-            log_level = "info"
+            log_level = "INFO"
 
         logger_instance.log(
             log_level, f"Response: {status} | Duration: {execution_time:.4f}s"

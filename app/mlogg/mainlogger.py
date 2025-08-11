@@ -130,11 +130,16 @@ def opener(file: str, flags: int) -> int:
     return os.open(file, flags, 0o600)
 
 
+def normalize_level(level: str) -> str:
+    """Ensure log level is uppercase for Loguru compatibility."""
+    return level.upper() if isinstance(level, str) else level
+
+
 class StreamToLogger:
     """Redirects stdout/stderr to loguru logger."""
 
     def __init__(self, level: str = "INFO"):
-        self._level = level
+        self._level = normalize_level(level)
 
     def write(self, buffer: str):
         for line in buffer.rstrip().splitlines():
