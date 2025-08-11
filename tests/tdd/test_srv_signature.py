@@ -3,18 +3,22 @@ from app.feature.member.srv_signature import OtomaxSignatureService
 
 
 @pytest.mark.unit
-def test_generate_transaction_signature_should_return_expected_signature():
+def test_generate_transaction_signature_should_return_expected_signature(
+    valid_trx_request,
+):
     # Arrange
-    memberid = "abc123"
-    product = "pulsa"
-    dest = "08123456789"
-    refid = "REF001"
-    pin = "1234"
-    password = "passw0rd"
+    memberid = valid_trx_request["memberid"]
+    product = valid_trx_request["product"]
+    dest = valid_trx_request["dest"]
+    refid = valid_trx_request["refid"]
+    pin = valid_trx_request["pin"]
+    password = valid_trx_request["password"]
+
     # Act
     signature = OtomaxSignatureService.generate_transaction_signature(
         memberid, product, dest, refid, pin, password
     )
+
     # Assert
     # Signature should be deterministic for same input
     expected = OtomaxSignatureService.generate_transaction_signature(
@@ -24,18 +28,20 @@ def test_generate_transaction_signature_should_return_expected_signature():
 
 
 @pytest.mark.unit
-def test_generate_transaction_signature_should_be_url_safe():
-    # Arrange
-    memberid = "abc123"
-    product = "pulsa"
-    dest = "08123456789"
-    refid = "REF001"
-    pin = "12+34/"
-    password = "pa+ss/w0rd"
+def test_generate_transaction_signature_should_be_url_safe(valid_trx_request):
+    # Arrange - modify data to include problematic characters
+    memberid = valid_trx_request["memberid"]
+    product = valid_trx_request["product"]
+    dest = valid_trx_request["dest"]
+    refid = valid_trx_request["refid"]
+    pin = "12+34/"  # Characters that should be encoded
+    password = "pa+ss/w0rd"  # Characters that should be encoded
+
     # Act
     signature = OtomaxSignatureService.generate_transaction_signature(
         memberid, product, dest, refid, pin, password
     )
+
     # Assert
     assert "+" not in signature and "/" not in signature, (
         f"Signature contains unsafe chars: {signature}"
@@ -43,37 +49,41 @@ def test_generate_transaction_signature_should_be_url_safe():
 
 
 @pytest.mark.unit
-def test_verify_signature_should_return_true_for_valid_signature():
+def test_verify_signature_should_return_true_for_valid_signature(valid_trx_request):
     # Arrange
     data = {
-        "memberid": "abc123",
-        "product": "pulsa",
-        "dest": "08123456789",
-        "refid": "REF001",
-        "pin": "1234",
-        "password": "passw0rd",
+        "memberid": valid_trx_request["memberid"],
+        "product": valid_trx_request["product"],
+        "dest": valid_trx_request["dest"],
+        "refid": valid_trx_request["refid"],
+        "pin": valid_trx_request["pin"],
+        "password": valid_trx_request["password"],
     }
     signature = OtomaxSignatureService.generate_transaction_signature(**data)
+
     # Act
     result = OtomaxSignatureService.verify_signature(data, signature)
+
     # Assert
     assert result is True, "Expected verification to succeed for valid signature"
 
 
 @pytest.mark.unit
-def test_verify_signature_should_return_false_for_invalid_signature():
+def test_verify_signature_should_return_false_for_invalid_signature(valid_trx_request):
     # Arrange
     data = {
-        "memberid": "abc123",
-        "product": "pulsa",
-        "dest": "08123456789",
-        "refid": "REF001",
-        "pin": "1234",
-        "password": "passw0rd",
+        "memberid": valid_trx_request["memberid"],
+        "product": valid_trx_request["product"],
+        "dest": valid_trx_request["dest"],
+        "refid": valid_trx_request["refid"],
+        "pin": valid_trx_request["pin"],
+        "password": valid_trx_request["password"],
     }
     invalid_signature = "invalidsignature"
+
     # Act
     result = OtomaxSignatureService.verify_signature(data, invalid_signature)
+
     # Assert
     assert result is False, "Expected verification to fail for invalid signature"
 
@@ -90,19 +100,23 @@ def test_verify_signature_should_return_false_for_invalid_signature():
         ("password", ""),
     ],
 )
-def test_generate_transaction_signature_should_handle_empty_fields(field, value):
+def test_generate_transaction_signature_should_handle_empty_fields(
+    field, value, valid_trx_request
+):
     # Arrange
     data = {
-        "memberid": "abc123",
-        "product": "pulsa",
-        "dest": "08123456789",
-        "refid": "REF001",
-        "pin": "1234",
-        "password": "passw0rd",
+        "memberid": valid_trx_request["memberid"],
+        "product": valid_trx_request["product"],
+        "dest": valid_trx_request["dest"],
+        "refid": valid_trx_request["refid"],
+        "pin": valid_trx_request["pin"],
+        "password": valid_trx_request["password"],
     }
     data[field] = value
+
     # Act
     signature = OtomaxSignatureService.generate_transaction_signature(**data)
+
     # Assert
     assert isinstance(signature, str) and len(signature) > 0, (
         f"Signature should be non-empty for empty {field}"
@@ -110,19 +124,22 @@ def test_generate_transaction_signature_should_handle_empty_fields(field, value)
 
 
 @pytest.mark.unit
-def test_otomax_signature_should_match_actual_generated_sign():
+def test_otomax_signature_should_match_actual_generated_sign(
+    otomax_signature_sample_data,
+):
     # Arrange
-    memberid = "vps"
-    pin = "777999"
-    password = "vps777999"
-    product = "CLPDATA"
-    qty = "1"  # noqa: F841
-    dest = "081295221639"
-    refid = "3041094LIST"
+    memberid = otomax_signature_sample_data["memberid"]
+    pin = otomax_signature_sample_data["pin"]
+    password = otomax_signature_sample_data["password"]
+    product = otomax_signature_sample_data["product"]
+    dest = otomax_signature_sample_data["dest"]
+    refid = otomax_signature_sample_data["refid"]
+    expected_sign = otomax_signature_sample_data["expected_sign"]
+
     # Act
     signature = OtomaxSignatureService.generate_transaction_signature(
         memberid, product, dest, refid, pin, password
     )
+
     # Assert
-    expected_sign = "FzqLAOMAa2yJKA7e-w_fSQkXjrY"
     assert signature == expected_sign, f"Expected {expected_sign}, got {signature}"
