@@ -1,11 +1,14 @@
 from contextlib import asynccontextmanager
 
 from app.database.session import sessionmanager
+from app.mlogg.mainlogger import setup_loguru
 from app.repos.rep_user import UserRepository
 from app.service.token.srv_token import TokenService
 from app.service.user.admin_service import AdminService
 from fastapi import FastAPI
 from loguru import logger
+
+setup_loguru()
 
 
 @asynccontextmanager
