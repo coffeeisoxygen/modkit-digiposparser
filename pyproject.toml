@@ -237,3 +237,18 @@ norecursedirs = [
     ".pytest_cache",
     ".reports",
 ]
+
+
+[tool.alembic]
+
+script_location = "%(here)s/alembic"
+
+prepend_sys_path = [
+    "."
+]
+[[tool.alembic.post_write_hooks]]
+# lint with attempts to fix using "ruff" - use the module runner, against the "ruff" module
+name = "ruff"
+type = "module"
+module = "ruff"
+options = "check --fix REVISION_SCRIPT_FILENAME"
