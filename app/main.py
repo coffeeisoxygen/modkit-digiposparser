@@ -1,12 +1,12 @@
-import time
 from typing import TYPE_CHECKING
 
 import uvicorn
 from app.custom.app_lifespan import lifespan
+from app.custom.app_middleware import LoggingMiddleware  # <-- import custom middleware
 
 # Impor fungsi registrasi router
 from app.router.rtr_register import register_routers
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 
 if TYPE_CHECKING:
     from app._version import __version__
@@ -23,14 +23,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    start_time = time.perf_counter()
-    response = await call_next(request)
-    process_time = time.perf_counter() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    return response
+app.add_middleware(LoggingMiddleware)  # <-- register custom middleware
 
 
 register_routers(app)
