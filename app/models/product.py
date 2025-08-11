@@ -5,6 +5,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
+    from .commands import ApiCommand
     from .provider import Provider
 
 
@@ -32,3 +33,7 @@ class Product(Base):
         ForeignKey("providers.code"), nullable=False
     )
     provider: Mapped["Provider"] = relationship("Provider", back_populates="products")
+
+    apicommands: Mapped[list["ApiCommand"]] = relationship(
+        "ApiCommand", back_populates="product"
+    )

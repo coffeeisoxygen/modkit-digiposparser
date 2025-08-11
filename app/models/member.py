@@ -13,20 +13,23 @@ class Member(Base):
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     pin: Mapped[str] = mapped_column(
-        String(64), nullable=False
+        String(), nullable=False
     )  # Store as string, not SecretStr
     password: Mapped[str] = mapped_column(
-        String(128), nullable=False
+        String(), nullable=False
     )  # Store as string, not SecretStr
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    ipaddress: Mapped[str] = mapped_column(String(15), nullable=False)  # IPv4 as string
-    report_url: Mapped[str] = mapped_column(String(255), nullable=False)
+    ipaddress: Mapped[str] = mapped_column(String(), nullable=False)  # IPv4 as string
+    report_url: Mapped[str] = mapped_column(String(), nullable=False)
     allow_nosign: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped = mapped_column(
+
+    description: Mapped[str] = mapped_column(String(), nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    updated_at: Mapped = mapped_column(
+    updated_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
     )

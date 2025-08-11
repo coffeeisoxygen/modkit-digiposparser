@@ -1,6 +1,11 @@
+from typing import TYPE_CHECKING
+
 from app.models import Base
 from sqlalchemy import JSON, Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+if TYPE_CHECKING:
+    from .commands import ApiCommand
 
 
 class Module(Base):
@@ -22,11 +27,15 @@ class Module(Base):
     description: Mapped[str] = mapped_column(
         String(), nullable=True
     )  # just descriotions
-    created_at: Mapped = mapped_column(
+    created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    updated_at: Mapped = mapped_column(
+    updated_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
+    )
+    apicommands: Mapped[list["ApiCommand"]] = relationship(
+        "ApiCommand", back_populates="module"
     )

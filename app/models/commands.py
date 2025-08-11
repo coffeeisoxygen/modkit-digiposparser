@@ -1,20 +1,40 @@
 from app.models import Base
-from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
-class Apicommand(Base):
-    r"""ini adalah junction table antara product dan module
-
-    jadi 1 product bisa memilki beberapa module yang akan handle dia,
-    jika di otomax anggap aja ini adalah table parsing.
-    """
-
+class ApiCommand(Base):
     __tablename__ = "apicommands"
 
-    product_id: Mapped[str] = mapped_column(
-        String(32), primary_key=True, nullable=False
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    product_code: Mapped[str] = mapped_column(
+        String(100), ForeignKey("products.code"), nullable=False
     )
     module_id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, nullable=False
+        Integer, ForeignKey("modules.id"), nullable=False
     )
+
+    command_template: Mapped[str] = mapped_column(String(1000), nullable=False)
+    # contoh: "list_paket?username=[username]&to=[to]&trxid=[trxid]&category=[category]"
+
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    created_at: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    # relasi opsional untuk kemudahan query
+    product = relationship("Product", back_populates="apicommands")
+    module = relationship("Module")
+
+
+# Jangan lupa di Product tambahin:
+# api_commands: Mapped[list["ApiCommand"]] = relationship("ApiCommand", back_populates="product")
