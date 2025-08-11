@@ -5,10 +5,17 @@ from sqlalchemy import Boolean, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from app.models.module import Module
+    from .product import Product
 
 
 class Provider(Base):
+    """Represents a provider in the system.
+
+    This model is used to store information about product providers.
+    has one to many relationship to product :
+    one provider can have many products not vice versa
+    """
+
     __tablename__ = "provider"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -23,4 +30,4 @@ class Provider(Base):
         server_default=func.now(),
         nullable=False,
     )
-    module: Mapped[list["Module"]] = relationship(back_populates="provider")
+    products: Mapped[list["Product"]] = relationship()
