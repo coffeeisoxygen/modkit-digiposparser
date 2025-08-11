@@ -117,7 +117,7 @@ class PlaintextResponseAdapter(ResponseAdapter):
         # Convert dict to key=value format
         parts = []
         for key, value in data.items():
-            if isinstance(value, (dict, list)):
+            if isinstance(value, dict | list):
                 value = str(value)
             parts.append(f"{key}={value}")
 

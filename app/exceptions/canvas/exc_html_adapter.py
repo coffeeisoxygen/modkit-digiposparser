@@ -74,7 +74,7 @@ class HtmlResponseAdapter(ResponseAdapter):
             icon = "❌"
         else:
             alert_class = "alert-info"
-            icon = "ℹ"
+            icon = "🔵"
 
         return f"""
         <div class="alert {alert_class}" role="alert">
@@ -97,14 +97,14 @@ class ConfigErrorAdapter(HtmlResponseAdapter):
 
     def format_error(self, error: Exception) -> HTMLResponse:
         """Format configuration-specific errors with more detail."""
-        if hasattr(error, "context") and "validation_errors" in error.context:
-            return self._render_validation_errors(error)
+        if hasattr(error, "context") and "validation_errors" in error.context:  # type: ignore
+            return self._render_validation_errors(error)  # type: ignore
 
         return super().format_error(error)
 
     def _render_validation_errors(self, error: Exception) -> str:
         """Render validation errors for configuration uploads."""
-        validation_errors = error.context.get("validation_errors", [])
+        validation_errors = error.context.get("validation_errors", [])  # type: ignore
 
         error_items = []
         for err in validation_errors:
