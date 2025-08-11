@@ -213,6 +213,7 @@ markers = [
     "database: mark test as database-related",
     "e2e: mark end to end testing",
     "quick: mark test as quick to run",
+    "indirect: mark test as indirect"
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
