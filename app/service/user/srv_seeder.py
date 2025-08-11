@@ -1,6 +1,6 @@
 """service untuk seeding seeding admin dan lain lain."""
 
-from app.feature.utils.hasher import Hasher
+from app.utils.hasher import Hasher
 from app.repos.rep_user import UserRepository
 from loguru import logger
 
