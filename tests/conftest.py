@@ -9,6 +9,12 @@ def sample_members_yaml_path():
     return Path(__file__).parent / ".sample" / "test_members.yaml"
 
 
+@pytest.fixture
+def sample_actual_data_members_yaml_path():
+    """Fixture to provide path to actual data members.yaml in the data directory."""
+    return Path(__file__).parent.parent / "data" / "members.yaml"
+
+
 # =============================================================================
 # MEMBER DATABASE FIXTURES (MemberInDB)
 # =============================================================================
