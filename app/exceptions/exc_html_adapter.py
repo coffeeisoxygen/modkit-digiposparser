@@ -98,7 +98,9 @@ class ConfigErrorAdapter(HtmlResponseAdapter):
     def format_error(self, error: Exception) -> HTMLResponse:
         """Format configuration-specific errors with more detail."""
         if hasattr(error, "context") and "validation_errors" in error.context:  # type: ignore
-            return self._render_validation_errors(error)  # type: ignore
+            html_content = self._render_validation_errors(error)  # type: ignore
+            status_code = getattr(error, "status_code", 500)
+            return HTMLResponse(content=html_content, status_code=status_code)
 
         return super().format_error(error)
 

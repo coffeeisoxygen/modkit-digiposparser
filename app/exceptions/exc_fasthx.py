@@ -7,7 +7,7 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-from app.exceptions.exceptions import AppExceptionError
+from app.exceptions.exc_base import AppExceptionError
 from app.exceptions.exc_html_adapter import (
     ConfigErrorAdapter,
     HtmlResponseAdapter,
