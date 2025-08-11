@@ -55,7 +55,7 @@ class DatabaseSessionManager:
         except SQLAlchemyError as e:
             await session.rollback()
             logger.error(f"Session error could not be established {e}")
-            raise ServiceError
+            raise ServiceError("Could not establish session") from e
         finally:
             await session.close()
 
@@ -64,5 +64,12 @@ sessionmanager = DatabaseSessionManager(settings.database_url)
 
 
 async def get_db_session():
+    """Get a database session.
+
+    This function provides a database session for the duration of the request.
+
+    Yields:
+        _type_: Database session
+    """
     async with sessionmanager.session() as session:
         yield session
