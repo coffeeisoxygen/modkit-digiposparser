@@ -5,13 +5,12 @@ error formatting, and template rendering.
 """
 
 import pytest
-from fastapi.responses import HTMLResponse
-
 from app.exceptions.canvas.exc_base import AppExceptionError, ServiceError
 from app.exceptions.canvas.exc_html_adapter import (
     ConfigErrorAdapter,
     HtmlResponseAdapter,
 )
+from fastapi.responses import HTMLResponse
 
 
 class MockTemplate:
@@ -50,7 +49,7 @@ class TestHtmlResponseAdapter:
         templates = MockTemplates()
 
         # Act
-        adapter = HtmlResponseAdapter(templates)
+        adapter = HtmlResponseAdapter(templates)  # type: ignore
 
         # Assert
         assert adapter.templates == templates
@@ -233,7 +232,7 @@ class TestConfigErrorAdapter:
     def setup_method(self):
         """Setup test adapter instance."""
         self.mock_templates = MockTemplates()
-        self.adapter = ConfigErrorAdapter(self.mock_templates)
+        self.adapter = ConfigErrorAdapter(self.mock_templates)  # type: ignore
 
     @pytest.mark.unit
     def test_inheritance(self):
