@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 
 from app.database.session import sessionmanager
-from app.feature.user import AdminSeeding
 from app.repos.rep_user import UserRepository
+from app.service.user import AdminSeeding
 from fastapi import FastAPI
 from loguru import logger
 

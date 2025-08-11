@@ -30,7 +30,7 @@ class UserAdminSeed(UserConfig, UserBase):
     Atau Ini Kklo Admin Mau Seed User.
     """
 
-    password: PasswordIsStrong = Field(
+    hashed_password: PasswordIsStrong = Field(
         description="Password must be strong", min_length=1
     )
     is_superuser: bool = Field(default=True)
@@ -47,19 +47,19 @@ class UserLogin(UserConfig):
     """
 
     username: UserNameIsAlNum = Field(..., max_length=64)
-    password: PasswordIsStrong = Field(..., min_length=1)
+    hashed_password: PasswordIsStrong = Field(..., min_length=1)
 
 
 class PasswordChange(UserConfig):
-    password: PasswordIsStrong = Field(description="Old password", min_length=1)
-    new_password: PasswordIsStrong = Field(
+    hashed_password: PasswordIsStrong = Field(description="Old password", min_length=1)
+    new_hashed_password: PasswordIsStrong = Field(
         description="New password must be strong", min_length=1
     )
 
-    @field_validator("new_password")
+    @field_validator("new_hashed_password")
     @classmethod
-    def check_new_password(cls, v, info):  # noqa: ANN001, ANN206
-        if v == info.data.get("password"):
+    def check_new_hashed_password(cls, v, info):  # noqa: ANN001, ANN206
+        if v == info.data.get("hashed_password"):
             raise ValueError("New password must be different from old password")
         return v
 
