@@ -4,6 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Member(Base):
+    r"""ini tuh member member yg akan consume API, kyk otomax atau siapa aja ."""
+
     __tablename__ = "members"
 
     memberid: Mapped[str] = mapped_column(
