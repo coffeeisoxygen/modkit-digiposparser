@@ -103,7 +103,7 @@ convention = "google"
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "ANN"]
 "scripts/*" = ["D100"]
-"__init__.py" = ["D104"]
+"__init__.py" = ["ALL"]
 "_version.py" = ["D", "ANN", "E", "W", "F", "I", "UP", "B"]
 "alembic/*.py" = ["ALL"]
 
@@ -138,6 +138,7 @@ exclude = [
     "**/Lib/",
     "**/lib/",
     "**/alembic/*",
+    "**/__init__.py",
     ]
 
 typeCheckingMode = "standard"
